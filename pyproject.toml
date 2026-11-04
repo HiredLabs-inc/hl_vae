@@ -1,0 +1,13 @@
+[project]
+name = "hl_vae"
+version = "0.0.0"
+description = "Veteran Academic Exchange"
+readme = "README.md"
+authors = [
+  { name = "Jeff Stock", email = "jeff.stock@hiredlabs.org" },
+  { name = "Daniel Murillo", email = "daniel.murillo@hiredlabs.org},
+]
+license = { text = "MIT" }
+
+[project.urls]
+"Homepage" = "https://veteranacademicexchange.org/"
