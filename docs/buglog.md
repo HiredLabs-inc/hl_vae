@@ -14,7 +14,7 @@ infrastructure work is tracked separately in [backlog.md](backlog.md).
 
 **Conventions**
 
-- **IDs:** `BUG-001`, `BUG-002`, … — sequential, never reused. Next free ID: **BUG-001**.
+- **IDs:** `BUG-001`, `BUG-002`, … — sequential, never reused. Next free ID: **BUG-002**.
 - **File names:** `<ID>-<kebab-slug>.md`, e.g. `bugfixes/open/BUG-001-login-redirect-loop.md`.
 - **Triaging a report:** copy [`templates/bugfix-template.md`](templates/bugfix-template.md)
   into `bugfixes/open/`, fill it in, and link it from the row (moving the row to *Triaged*).
@@ -43,3 +43,4 @@ infrastructure work is tracked separately in [backlog.md](backlog.md).
 
 | ID | Title | Area | Doc | Updated |
 |---|---|---|---|---|
+| BUG-001 | `.idea/` files still tracked in git | Infrastructure | [BUG-001](bugfixes/closed/BUG-001-idea-files-tracked-in-git.md) | 2026-11-08 |

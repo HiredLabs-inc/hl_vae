@@ -130,7 +130,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# JetBrains IDE settings (any depth)
 .idea/
-.idea*
-.idea
-.idea/*
