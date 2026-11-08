@@ -5,7 +5,7 @@ description = "Veteran Academic Exchange"
 readme = "README.md"
 authors = [
   { name = "Jeff Stock", email = "jeff.stock@hiredlabs.org" },
-  { name = "Daniel Murillo", email = "daniel.murillo@hiredlabs.org},
+  { name = "Daniel Murillo", email = "daniel.murillo@hiredlabs.org"},
 ]
 license = { text = "MIT" }
 
