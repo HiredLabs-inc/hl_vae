@@ -273,7 +273,13 @@ edits. Its SHA is added to a new `.git-blame-ignore-revs` file, so
 
 ## Implementation Plan
 
-Lands after DES-002, on a branch off `develop`.
+Lands after DES-002 **and DES-006**, on a branch off `develop`.
+
+> **Note (from DES-002 implementation, 2026-11-08):** with the DES-002
+> settings loading, `manage.py check` warns `staticfiles.W004` because
+> `static/` doesn't exist yet. Step 6 runs with `--fail-level WARNING`, so it
+> fails until DES-006 adds `static/.gitkeep`. Land DES-006 first, or this PR
+> starts red.
 
 - [ ] Add `ruff` and `pytest-cov` to the `dev` extra; run `uv lock`.
 - [ ] Add `[tool.ruff]`, `[tool.ruff.lint]`, `[tool.coverage.run]` and the
@@ -319,3 +325,4 @@ Lands after DES-002, on a branch off `develop`.
 ## Changelog
 
 - 2026-11-08 — Created.
+- 2026-11-08 — Noted from the DES-002 implementation: step 6 fails on `staticfiles.W004` until DES-006 lands, so this now lands after DES-006 too.

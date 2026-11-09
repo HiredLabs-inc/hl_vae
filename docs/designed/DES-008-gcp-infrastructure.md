@@ -249,6 +249,14 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
      DES-003, then hosts, CSRF origins, Postgres and the secure-cookie, HSTS
      and SSL-proxy settings. Switch `stage.py` to `from .cloud import *`.
    - [ ] Add `hl_vae/settings/build.py` with the docstring from DES-006.
+   - [ ] Fix `[tool.setuptools]` in `pyproject.toml` before the Dockerfile.
+     It lists `packages = ["hl_vae", "works"]` explicitly, so a built wheel
+     leaves out `hl_vae/settings/` and `works/migrations/` (checked against
+     the DES-002 code, 2026-11-08). Running from the repo or from an editable
+     install hides this. A non-editable install in the image (for example
+     `uv sync --no-editable`) would fail with no settings module. Switch to
+     `[tool.setuptools.packages.find]` with `include = ["hl_vae*", "works*"]`,
+     or list the subpackages.
    - [ ] Add a `Dockerfile` (with DES-006's `collectstatic` step) and a
      `.dockerignore` listing `staticfiles/`, `.env` and `.env.*`. Check that
      `docker build` works and that the container serves locally against
@@ -304,6 +312,10 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
 - ~~Custom domain later?~~ **Answered:** yes, the intent is
   `veteranacademicexchange.org`, but it depends on real-world factors.
   Tracked as **DES-009** (Idea).
+- Will the image install the project non-editable? If so, the
+  `[tool.setuptools]` fix in step 1 is required, not optional. Either way,
+  `docker build` in step 1 should confirm `hl_vae.settings.stage` imports
+  inside the container.
 - At the first `envs/stage` apply, confirm `vae-stage-sql` gets an address in
   `sql-dev` (10.0.32.0/24). If the producer subnet can't take it, allocate a
   second range on `vpc-staging-shared` in `shared/`.
@@ -313,3 +325,4 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
 - 2026-11-08 — Created. Open questions answered by the user, and the subnet capacity was checked.
 - 2026-11-08 — Cloud Run now uses `hl_vae.settings.stage` (which imports `cloud`), following the DES-002 layout.
 - 2026-11-08 — Step 1 narrowed to the Cloud Run-specific pieces; DES-002, DES-006 and DES-003's local half land first. Added `hl_vae/cloudrun.py` (`deterministic_host`, `load_app_env`) to the app contract. `build.py` inherits static settings (DES-006).
+- 2026-11-08 — Noted from the DES-002 implementation: `[tool.setuptools] packages` leaves `hl_vae.settings` and `works.migrations` out of a built wheel. Added a fix to step 1 and an open question.
