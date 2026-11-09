@@ -133,7 +133,19 @@ details are built in the follow-up items.
     and loads it with `django-environ`. Values already in the environment win.
   - It sets `DEBUG = False`. `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` come from
     `ALLOWED_HOSTS` plus the host of `CLOUDRUN_SERVICE_URL`, plus the
-    deterministic `*-<project number>.us-west1.run.app` host.
+    deterministic `*-<project number>.us-west1.run.app` host from
+    `deterministic_host()` (below).
+- **Runtime helpers in `hl_vae/cloudrun.py`**, outside `settings/` so they
+  can't be mistaken for a settings module and can be unit-tested with fakes.
+  It follows `hl_main/hl_main/cloudrun.py`:
+  - `deterministic_host(region)` returns `<K_SERVICE>-<project number>.<region>.run.app`.
+    It reads `K_SERVICE` (set by Cloud Run services, not jobs) and the project
+    number from the metadata server
+    (`computeMetadata/v1/project/numeric-project-id`, 2-second timeout). It
+    returns `None` outside a Cloud Run service or if the metadata server can't
+    be reached, logging a warning, so jobs and local runs still start.
+  - `load_app_env(env, project_id, secret_name)` reads the Secret Manager blob
+    into the environment. Specified in DES-003.
   - Postgres connects on private IP with `CONN_MAX_AGE = 60` and
     `CONN_HEALTH_CHECKS = True`. db-f1-micro allows about 25 connections, and
     one instance with 8 threads uses at most 8.
@@ -150,7 +162,8 @@ details are built in the follow-up items.
   ALLOWED_HOSTS=               # empty on stage
   ```
 - **Build-only settings module `hl_vae.settings.build`**, with no secrets and no
-  database, so `collectstatic` can run during `docker build`.
+  database, so `collectstatic` can run during `docker build`. It inherits the
+  static settings from `base.py` and doesn't override them (DES-006).
 - **Dockerfile:** `python:3.12-slim` with uv (`uv sync --frozen --no-dev`).
   It runs `collectstatic` at build time and starts with
   `gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 8 --timeout 0 hl_vae.wsgi:application`.
@@ -222,11 +235,24 @@ hl_main.
 
 Work happens on a branch off `develop` and reaches stage through `develop` → `staging`.
 
-1. **App contract** (implements parts of DES-002, -003 and -006):
-   - [ ] Add the dependencies, `hl_vae/settings/cloud.py`, `hl_vae/settings/build.py`
-     and WhiteNoise, and switch `stage.py` to `from .cloud import *` (layout from DES-002). Move the hardcoded `SECRET_KEY` out of the committed settings.
-   - [ ] Add a `Dockerfile` and `.dockerignore`. Check that `docker build` works
-     and that the container serves locally against Postgres.
+1. **App contract.** Starts after DES-002, DES-006 and the local half of
+   DES-003 have landed. Those already provide the settings package (with the
+   hardcoded `SECRET_KEY` removed), WhiteNoise and the static settings, the
+   `env` reader, `DATABASE_URL` in `dev.py`, and `.env.example`. This step adds
+   only what's specific to Cloud Run:
+   - [ ] Add `gunicorn` and `psycopg[binary]` to the dependencies.
+     (`django-environ` and `whitenoise` arrive with DES-003 and DES-006;
+     `google-cloud-secret-manager` is added here with the loader, per DES-003.)
+   - [ ] Add `hl_vae/cloudrun.py` with `deterministic_host` (above) and
+     `load_app_env` (DES-003).
+   - [ ] Add `hl_vae/settings/cloud.py`: secret loading and `SECRET_KEY` per
+     DES-003, then hosts, CSRF origins, Postgres and the secure-cookie, HSTS
+     and SSL-proxy settings. Switch `stage.py` to `from .cloud import *`.
+   - [ ] Add `hl_vae/settings/build.py` with the docstring from DES-006.
+   - [ ] Add a `Dockerfile` (with DES-006's `collectstatic` step) and a
+     `.dockerignore` listing `staticfiles/`, `.env` and `.env.*`. Check that
+     `docker build` works and that the container serves locally against
+     Postgres via `DATABASE_URL`.
 2. **Terraform skeleton:**
    - [ ] Add `infra/terraform/{shared,modules/vae-env,envs/stage}` and
      `infra/cloudbuild/deploy.yaml`.
@@ -286,3 +312,4 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
 
 - 2026-11-08 — Created. Open questions answered by the user, and the subnet capacity was checked.
 - 2026-11-08 — Cloud Run now uses `hl_vae.settings.stage` (which imports `cloud`), following the DES-002 layout.
+- 2026-11-08 — Step 1 narrowed to the Cloud Run-specific pieces; DES-002, DES-006 and DES-003's local half land first. Added `hl_vae/cloudrun.py` (`deterministic_host`, `load_app_env`) to the app contract. `build.py` inherits static settings (DES-006).
