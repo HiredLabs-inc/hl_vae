@@ -31,7 +31,7 @@ infrastructure task, or refactor gets a row here. Bugs are tracked separately in
 | ID | Title | Area | Doc | Updated | Status |
 |---|---|---|---|---|---|
 | DES-001 | Design docs system | Process | [doc](archive/DES-001-design-docs-system.md) | 2026-11-08 | Done |
-| DES-002 | Split settings into base / dev / prod | Infrastructure | | 2026-11-08 | Idea |
+| DES-002 | Settings package (base / dev / stage / prod) | Infrastructure | [doc](designed/DES-002-settings-split.md) | 2026-11-08 | Designed |
 | DES-003 | Environment config and secrets management | Infrastructure | | 2026-11-08 | Idea |
 | DES-004 | Database choice (PostgreSQL vs SQLite) | Infrastructure | merged into [DES-008](designed/DES-008-gcp-infrastructure.md) | 2026-11-08 | Dropped |
 | DES-005 | CI pipeline: tests and lint | Infrastructure | | 2026-11-08 | Idea |

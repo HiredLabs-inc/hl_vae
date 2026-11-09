@@ -125,9 +125,10 @@ Provider: `hashicorp/google ~> 6.20`, Terraform `>= 1.5`. Use the same pins as h
 This is what the code has to provide for the infrastructure to work. The
 details are built in the follow-up items.
 
-- **Settings module `hl_vae.settings.cloud`** (DES-002 and DES-003 split the rest).
+- **Settings module `hl_vae.settings.cloud`**, shared by every Cloud Run environment.
+  `hl_vae.settings.stage` imports it (DES-002 sets up the package; DES-003 covers the rest).
   It follows `hl_main/settings/cloud.py`:
-  - The Cloud Run env sets `DJANGO_SETTINGS_MODULE`, `GCP_PROJECT_ID` and `GCP_SECRETS_NAME`.
+  - The Cloud Run env sets `DJANGO_SETTINGS_MODULE=hl_vae.settings.stage`, `GCP_PROJECT_ID` and `GCP_SECRETS_NAME`.
   - At import, it reads `projects/$GCP_PROJECT_ID/secrets/$GCP_SECRETS_NAME/versions/latest`
     and loads it with `django-environ`. Values already in the environment win.
   - It sets `DEBUG = False`. `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` come from
@@ -223,7 +224,7 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
 
 1. **App contract** (implements parts of DES-002, -003 and -006):
    - [ ] Add the dependencies, `hl_vae/settings/cloud.py`, `hl_vae/settings/build.py`
-     and WhiteNoise. Move the hardcoded `SECRET_KEY` out of the committed settings.
+     and WhiteNoise, and switch `stage.py` to `from .cloud import *` (layout from DES-002). Move the hardcoded `SECRET_KEY` out of the committed settings.
    - [ ] Add a `Dockerfile` and `.dockerignore`. Check that `docker build` works
      and that the container serves locally against Postgres.
 2. **Terraform skeleton:**
@@ -284,3 +285,4 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
 ## Changelog
 
 - 2026-11-08 — Created. Open questions answered by the user, and the subnet capacity was checked.
+- 2026-11-08 — Cloud Run now uses `hl_vae.settings.stage` (which imports `cloud`), following the DES-002 layout.
