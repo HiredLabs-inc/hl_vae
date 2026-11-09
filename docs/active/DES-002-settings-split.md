@@ -99,9 +99,9 @@ base ─┬─ dev
 ```
 
 `__init__.py` stays **empty**. It doesn't star-import `dev`. A bare
-`DJANGO_SETTINGS_MODULE=hl_vae.settings` therefore still fails with the
-`SECRET_KEY` error and doesn't quietly run with dev settings somewhere it
-shouldn't.
+`DJANGO_SETTINGS_MODULE=hl_vae.settings` therefore loads no settings at all.
+`runserver` refuses to start (`You must set settings.ALLOWED_HOSTS if DEBUG is
+False`), and it never quietly runs with dev settings somewhere it shouldn't.
 
 ### `base.py`
 
@@ -181,9 +181,13 @@ and put prod-only settings below it.
 from .base import *  # noqa: F403
 ```
 
-- Because `base.py` sets no `SECRET_KEY` or `DATABASES`, either module **fails
-  at startup** until it's configured. Pointing a deployment at `prod` by
-  mistake can't serve anything.
+- Because `base.py` sets no `SECRET_KEY`, `DATABASES` or `ALLOWED_HOSTS` and
+  has `DEBUG = False`, neither module can serve anything until it's
+  configured. Pointing a deployment at `prod` by mistake gets a 400 on every
+  request. `migrate` fails (`settings.DATABASES is improperly configured`), and
+  `runserver` refuses to start. Neither module fails at import, though. Django
+  5.2 checks `SECRET_KEY` only when something reads it, so `manage.py check`
+  passes and gunicorn starts.
 - This is the same shape as hl_main: `stage.py` and `prod.py` are thin
   modules on top of a shared `cloud.py`. In hl_main they're legacy aliases.
   In VAE they're what each environment's deployment uses, and they're where
@@ -258,29 +262,32 @@ environments need and doesn't have to override dev values.
 
 On a branch off `develop`, before DES-008 step 1.
 
-- [ ] `git mv hl_vae/settings/settings.py hl_vae/settings/base.py` and commit
+- [x] `git mv hl_vae/settings/settings.py hl_vae/settings/base.py` and commit
   the move on its own, so history follows the file.
-- [ ] Add an empty `hl_vae/settings/__init__.py`.
-- [ ] Edit `base.py`: fix `BASE_DIR`, remove `SECRET_KEY` and `DATABASES`, set
+- [x] Add an empty `hl_vae/settings/__init__.py`.
+- [x] Edit `base.py`: fix `BASE_DIR`, remove `SECRET_KEY` and `DATABASES`, set
   `DEBUG = False` and `ALLOWED_HOSTS = []`, add `DEFAULT_AUTO_FIELD`, and replace
   the docstring.
-- [ ] Add `dev.py` with a newly generated dev key
+- [x] Add `dev.py` with a newly generated dev key
   (`python -c "from django.core.management.utils import get_random_secret_key as k; print(k())"`).
-- [ ] Add placeholder `stage.py` and `prod.py`.
-- [ ] Add `test.py`.
-- [ ] Point `manage.py` at `hl_vae.settings.dev`. Make `wsgi.py` and `asgi.py`
+- [x] Add placeholder `stage.py` and `prod.py`.
+- [x] Add `test.py`.
+- [x] Point `manage.py` at `hl_vae.settings.dev`. Make `wsgi.py` and `asgi.py`
   require `DJANGO_SETTINGS_MODULE`.
-- [ ] Add `[tool.pytest.ini_options]` to `pyproject.toml`.
-- [ ] Add a smoke test in `works/tests.py` (see below).
-- [ ] Update `README.md`: list the settings modules, say which one each command
-  uses, and how to run gunicorn locally (`DJANGO_SETTINGS_MODULE=hl_vae.settings.dev`).
+- [x] Add `[tool.pytest.ini_options]` to `pyproject.toml`.
+- [x] Add a smoke test in `works/tests.py` (see below).
+- [x] Update `README.md`: list the settings modules and say which one each
+  command uses. (There's no gunicorn section. gunicorn isn't a dependency yet,
+  and DES-008 adds it.)
 
 ## Testing / Verification
 
 - `uv run python manage.py diffsettings --all | grep -E "^(BASE_DIR|DEBUG|ROOT_URLCONF|INSTALLED_APPS)"`
   shows the repo root, `True`, `hl_vae.urls` and the `works` app. This proves
   the real settings load.
-- `uv run python manage.py check` passes with the apps actually installed.
+- `uv run python manage.py check` passes with the apps actually installed. The
+  only warning is `staticfiles.W004` for the missing `static/` directory,
+  which DES-006 owns.
 - `uv run python manage.py migrate && uv run python manage.py runserver`, then
   `/` renders `templates/index.html` and `/admin/` loads.
 - `db.sqlite3` is created at the repo root, not under `hl_vae/`.
@@ -288,9 +295,14 @@ On a branch off `develop`, before DES-008 step 1.
   warns about `SECRET_KEY` and `DEBUG`. That's expected for dev, and it shows the
   insecure prefix is being detected.
 - With `DJANGO_SETTINGS_MODULE` set to `hl_vae.settings.stage` and then to
-  `hl_vae.settings.prod`, `uv run python manage.py check` fails with
-  `The SECRET_KEY setting must not be empty`. This confirms both placeholders
-  refuse to run until they're configured.
+  `hl_vae.settings.prod`:
+  - `uv run python manage.py migrate` fails with `settings.DATABASES is
+    improperly configured`.
+  - `uv run python manage.py runserver` fails with `You must set
+    settings.ALLOWED_HOSTS if DEBUG is False`.
+  - Through `hl_vae.wsgi`, `GET /` returns 400.
+
+  This confirms both placeholders can't serve until they're configured.
 - `uv run python -c "import hl_vae.wsgi"` with `DJANGO_SETTINGS_MODULE` unset
   fails with the new `ImproperlyConfigured` message.
 - `uv run pytest` passes and runs the smoke test:
@@ -307,3 +319,4 @@ On a branch off `develop`, before DES-008 step 1.
 - 2026-11-08 — Agreed by the user. Added `stage.py` and `prod.py` (one module per environment; prod empty for now). Local Docker overrides deferred to DES-003.
 - 2026-11-08 — `build.py` no longer sets WhiteNoise storage itself; it inherits the static settings from `base.py`, matching DES-006.
 - 2026-11-08 — Implementation started on `feature/settings-update-DES-002`; moved to `active/`.
+- 2026-11-08 — Corrected the placeholder claims after implementation. On Django 5.2, `SECRET_KEY` is checked only when read, so stage and prod don't fail at import or in `check`. They still can't serve (400 on every request, no database). The verification steps now test that. The README has no gunicorn section until DES-008 adds gunicorn.
