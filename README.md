@@ -25,6 +25,27 @@ uv run pytest
 
 Use `uv run` for all local commands so they always execute in the synced project environment.
 
+## Settings
+
+Settings live in the `hl_vae/settings/` package, one module per environment.
+All of them import the shared `base.py`, which has safe defaults (no secret key,
+no database, `DEBUG = False`, no allowed hosts).
+
+| Module | Used for | Used by |
+|---|---|---|
+| `hl_vae.settings.dev` | Local development (SQLite, `DEBUG = True`, dev-only key) | `manage.py` by default |
+| `hl_vae.settings.test` | Tests and CI | `uv run pytest` (set in `pyproject.toml`) |
+| `hl_vae.settings.stage` | Stage on Cloud Run (placeholder until DES-008) | Cloud Run, via `DJANGO_SETTINGS_MODULE` |
+| `hl_vae.settings.prod` | Prod (placeholder; not configured yet) | Nothing yet |
+
+`hl_vae/wsgi.py` and `hl_vae/asgi.py` have no default and refuse to start unless
+`DJANGO_SETTINGS_MODULE` is set. To use a different module with `manage.py`, set
+the variable, for example:
+
+```bash
+DJANGO_SETTINGS_MODULE=hl_vae.settings.test uv run python manage.py check
+```
+
 ## Design docs
 
 Design work is tracked in [`docs/`](docs/):
