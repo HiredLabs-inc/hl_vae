@@ -1,6 +1,6 @@
 # DES-002: Settings package (base / dev / stage / prod)
 
-- **Status:** Designed
+- **Status:** In Progress
 - **Area:** Infrastructure
 - **Created:** 2026-11-08
 - **Updated:** 2026-11-08
@@ -306,3 +306,4 @@ On a branch off `develop`, before DES-008 step 1.
 - 2026-11-08 — Created. Confirmed that the current settings never load, and that `BASE_DIR` is off by one level.
 - 2026-11-08 — Agreed by the user. Added `stage.py` and `prod.py` (one module per environment; prod empty for now). Local Docker overrides deferred to DES-003.
 - 2026-11-08 — `build.py` no longer sets WhiteNoise storage itself; it inherits the static settings from `base.py`, matching DES-006.
+- 2026-11-08 — Implementation started on `feature/settings-update-DES-002`; moved to `active/`.
