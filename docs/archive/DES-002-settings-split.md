@@ -1,6 +1,6 @@
 # DES-002: Settings package (base / dev / stage / prod)
 
-- **Status:** In Progress
+- **Status:** Done
 - **Area:** Infrastructure
 - **Created:** 2026-11-08
 - **Updated:** 2026-11-08
@@ -320,3 +320,4 @@ On a branch off `develop`, before DES-008 step 1.
 - 2026-11-08 — `build.py` no longer sets WhiteNoise storage itself; it inherits the static settings from `base.py`, matching DES-006.
 - 2026-11-08 — Implementation started on `feature/settings-update-DES-002`; moved to `active/`.
 - 2026-11-08 — Corrected the placeholder claims after implementation. On Django 5.2, `SECRET_KEY` is checked only when read, so stage and prod don't fail at import or in `check`. They still can't serve (400 on every request, no database). The verification steps now test that. The README has no gunicorn section until DES-008 adds gunicorn.
+- 2026-11-08 — Done. Merged into `develop`; moved to `archive/`.
