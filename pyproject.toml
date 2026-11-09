@@ -28,5 +28,9 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 packages = ["hl_vae", "works"]
 
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "hl_vae.settings.test"
+python_files = ["tests.py", "test_*.py"]
+
 [project.urls]
 "Homepage" = "https://veteranacademicexchange.org/"
