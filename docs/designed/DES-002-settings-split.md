@@ -228,8 +228,10 @@ instead of serving with `DEBUG = True`.
 
 DES-008 step 1 makes these settings changes and nothing else:
 
-- Adds `build.py`: `from .base import *`, a non-secret key, and WhiteNoise
-  storage. It has no database.
+- Adds `build.py`: `from .base import *` and a non-secret key. It has no
+  database. It inherits every static setting (`STATIC_ROOT`, `STORAGES` with
+  WhiteNoise) from `base.py` and must not override them, so the build writes
+  exactly what `cloud.py` serves (DES-006).
 - Adds `cloud.py`: `from .base import *`, loads the Secret Manager blob, then
   sets `SECRET_KEY`, `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, Postgres, and the
   secure-cookie, HSTS and SSL-proxy settings.
@@ -303,3 +305,4 @@ On a branch off `develop`, before DES-008 step 1.
 
 - 2026-11-08 — Created. Confirmed that the current settings never load, and that `BASE_DIR` is off by one level.
 - 2026-11-08 — Agreed by the user. Added `stage.py` and `prod.py` (one module per environment; prod empty for now). Local Docker overrides deferred to DES-003.
+- 2026-11-08 — `build.py` no longer sets WhiteNoise storage itself; it inherits the static settings from `base.py`, matching DES-006.

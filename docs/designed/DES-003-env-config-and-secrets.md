@@ -358,22 +358,31 @@ leaked into git, rotating it is the fix. Rewriting history isn't required.
 
 ## Implementation Plan
 
-On a branch off `develop`, after DES-002 and as part of DES-008 step 1.
+In two parts, each on a branch off `develop`.
 
-- [ ] Add `django-environ` and `google-cloud-secret-manager` to
-  `[project] dependencies` in `pyproject.toml`, and run `uv lock`.
+**Local half**, after DES-002 and before DES-008 step 1:
+
+- [ ] Add `django-environ` to `[project] dependencies` in `pyproject.toml`,
+  and run `uv lock`.
 - [ ] Add `env = environ.Env()` to `base.py`.
 - [ ] Change `dev.py` to the version above: optional `.env`, `DJANGO_DEBUG`,
   `DJANGO_SECRET_KEY`, `ALLOWED_HOSTS`, `DATABASE_URL`.
-- [ ] Add `load_app_env` to `hl_vae/cloudrun.py`, and call it from `cloud.py`
-  with `SECRET_KEY` and `SECRET_KEY_FALLBACKS` read as above.
-- [ ] Add `.env.example` and update `.gitignore`. Make sure DES-008's
-  `.dockerignore` lists `.env` and `.env.*`.
-- [ ] Add the catalogue and runbook to `infra/README.md`, and the
-  `secret_managers` variable to `modules/vae-env` (once its value is decided).
-- [ ] Add the tests below.
+- [ ] Add `.env.example` and update `.gitignore`.
+- [ ] Add the `.env` and `DATABASE_URL` tests below.
 - [ ] Update `README.md`: copy `.env.example` to `.env` to override dev
   settings; nothing is needed by default.
+
+**Cloud Run half**, as part of DES-008 step 1:
+
+- [ ] Add `google-cloud-secret-manager` to `[project] dependencies`, and run
+  `uv lock`.
+- [ ] Add `load_app_env` to `hl_vae/cloudrun.py` (next to `deterministic_host`,
+  per the DES-008 app contract), and call it from `cloud.py` with `SECRET_KEY`
+  and `SECRET_KEY_FALLBACKS` read as above.
+- [ ] Make sure DES-008's `.dockerignore` lists `.env` and `.env.*`.
+- [ ] Add the `load_app_env` tests below.
+- [ ] Add the catalogue and runbook to `infra/README.md`, and the
+  `secret_managers` variable to `modules/vae-env` (once its value is decided).
 
 ## Testing / Verification
 
@@ -421,3 +430,4 @@ Manual:
 ## Changelog
 
 - 2026-11-08 — Created.
+- 2026-11-08 — Implementation split into a local half (before DES-008) and a Cloud Run half (with DES-008 step 1). `deterministic_host` is now defined in DES-008's app contract.
