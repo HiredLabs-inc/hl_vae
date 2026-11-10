@@ -6,7 +6,8 @@ environment modules, which import everything from here and add their own values:
 
 - hl_vae.settings.dev    local development (manage.py's default)
 - hl_vae.settings.test   pytest and CI
-- hl_vae.settings.stage  stage on Cloud Run (placeholder until DES-008)
+- hl_vae.settings.stage  stage on Cloud Run (imports cloud.py, DES-008)
+- hl_vae.settings.build  `collectstatic` during `docker build` only
 - hl_vae.settings.prod   prod (placeholder until a prod environment is designed)
 
 Defaults here are the safe ones: no SECRET_KEY, no DATABASES, DEBUG off and no
