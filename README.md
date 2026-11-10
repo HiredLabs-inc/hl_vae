@@ -25,6 +25,43 @@ uv run pytest
 
 Use `uv run` for all local commands so they always execute in the synced project environment.
 
+### 4. Check your work before pushing
+
+This runs what CI runs. Locally it formats and fixes; CI only checks:
+
+```bash
+uv run ruff format . && uv run ruff check --fix . && uv run python manage.py makemigrations --check --dry-run && uv run pytest
+```
+
+Editors can use the Ruff extension, which reads the config in `pyproject.toml`.
+
+To make `git blame` skip the bulk formatting commit, run this once:
+
+```bash
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+```
+
+## CI
+
+GitHub Actions runs on every pull request into `develop`, `staging` or `main`,
+and on every push to those branches (DES-005 in the [backlog](docs/backlog.md)).
+
+- **`CI / checks`** (`.github/workflows/ci.yml`) is the required check. It
+  runs these steps against `hl_vae.settings.test`:
+  - `uv sync --locked`, which fails if `uv.lock` is stale;
+  - `ruff format --check`;
+  - `ruff check`;
+  - `manage.py check --fail-level WARNING`;
+  - `makemigrations --check`;
+  - `pytest` with a coverage report.
+
+  After a failure, the remaining checks still run, so one run shows every
+  problem.
+- **`Terraform`** (`.github/workflows/terraform.yml`) runs `terraform fmt` and
+  `validate` only when `infra/terraform/` changes. It isn't required.
+
+CI uses no secrets and has no cloud access.
+
 ## Settings
 
 Settings live in the `hl_vae/settings/` package, one module per environment.

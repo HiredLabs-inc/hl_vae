@@ -281,14 +281,14 @@ Lands after DES-002 **and DES-006**, on a branch off `develop`.
 > fails until DES-006 adds `static/.gitkeep`. Land DES-006 first, or this PR
 > starts red.
 
-- [ ] Add `ruff` and `pytest-cov` to the `dev` extra; run `uv lock`.
-- [ ] Add `[tool.ruff]`, `[tool.ruff.lint]`, `[tool.coverage.run]` and the
+- [x] Add `ruff` and `pytest-cov` to the `dev` extra; run `uv lock`.
+- [x] Add `[tool.ruff]`, `[tool.ruff.lint]`, `[tool.coverage.run]` and the
   extra pytest options to `pyproject.toml`.
-- [ ] Commit the formatting-only cleanup on its own, then add its SHA to
+- [x] Commit the formatting-only cleanup on its own, then add its SHA to
   `.git-blame-ignore-revs` in the next commit.
-- [ ] Add `.github/workflows/ci.yml` with job `checks`.
-- [ ] Add `.github/workflows/terraform.yml` (dormant until `infra/terraform/` exists).
-- [ ] Add the local check command and a CI section to `README.md`.
+- [x] Add `.github/workflows/ci.yml` with job `checks`.
+- [x] Add `.github/workflows/terraform.yml` (dormant until `infra/terraform/` exists).
+- [x] Add the local check command and a CI section to `README.md`.
 - [ ] Open the PR and confirm `CI / checks` runs and passes.
 - [ ] **By hand (user):** add branch protection on `develop` and `main`
   requiring `CI / checks`. Add the `staging` rule when DES-008's bootstrap
@@ -326,3 +326,10 @@ Lands after DES-002 **and DES-006**, on a branch off `develop`.
 
 - 2026-11-08 — Created.
 - 2026-11-08 — Noted from the DES-002 implementation: step 6 fails on `staticfiles.W004` until DES-006 lands, so this now lands after DES-006 too.
+- 2026-11-10 — Implementation started on `feature/ci-pipeline-DES-005`. Installed ruff 0.17.4 and pytest-cov 7.1.0, with bounded ranges in `pyproject.toml` (`ruff>=0.17.4,<0.18`, because minor releases can change formatting). Changes from the design:
+  - `extend-exclude` adds `*.md`, because ruff 0.17 formats Python code blocks inside Markdown and would rewrite the design docs.
+  - Two long lines that `ruff check --fix` can't fix were handled by hand in a separate commit after the cleanup commit: a `# noqa: E501` on Django's `UserAttributeSimilarityValidator` path, and a rewrapped line in `works/tests.py`.
+  - Both workflows check out with `persist-credentials: false`.
+  - `terraform.yml` asks for Terraform `^1.5.0`.
+  - Actions are pinned to `actions/checkout` v7.0.1, `astral-sh/setup-uv` v10.3.3 and `hashicorp/setup-terraform` v4.0.1.
+  - The cleanup commit's SHA in `.git-blame-ignore-revs` only stays valid if the PR is merged with a merge commit, not squashed or rebased.
