@@ -1,9 +1,9 @@
 # DES-008: GCP infrastructure (stage on Cloud Run)
 
-- **Status:** Designed
+- **Status:** In Progress (step 1: app contract)
 - **Area:** Infrastructure
 - **Created:** 2026-11-08
-- **Updated:** 2026-11-08
+- **Updated:** 2026-11-10
 - **Related:** supersedes DES-004 and DES-007. Follow-ups: DES-002, DES-003, DES-005, DES-006, DES-009. Modeled on `hl_main/infra/` (`TARGET_DESIGN.md`, `README.md`).
 
 ## Summary
