@@ -83,6 +83,32 @@ the variable, for example:
 DJANGO_SETTINGS_MODULE=hl_vae.settings.test uv run python manage.py check
 ```
 
+### Local configuration
+
+Nothing is needed by default. A fresh clone runs on SQLite with `DEBUG` on.
+To override dev settings, copy the example file and uncomment what you need:
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Default in `dev.py` |
+|---|---|
+| `DJANGO_DEBUG` | `true` (if `false`, run `collectstatic` first; see Static files) |
+| `DJANGO_SECRET_KEY` | a built-in dev-only key |
+| `ALLOWED_HOSTS` | `localhost,127.0.0.1,[::1]` |
+| `DATABASE_URL` | SQLite at `db.sqlite3` (a `postgres://` URL needs `psycopg`, which arrives with DES-008) |
+
+- **Precedence:** shell variables, including `docker run -e`, win over `.env`.
+  `.env` and every `.env.*` except `.env.example` are gitignored.
+- **Who reads `.env`:** only `hl_vae.settings.dev` reads it. Tests and the
+  Docker build read no environment, so a local `.env` can't change test
+  results.
+- **Where settings come from:** every settings module reads config through
+  the single `env` object defined in `base.py` (`django-environ`). App code
+  reads `django.conf.settings`, never the environment. See DES-003 in the
+  [backlog](docs/backlog.md).
+
 ## Static files
 
 Static files are served by [WhiteNoise](https://whitenoise.readthedocs.io/) in

@@ -5,6 +5,7 @@ description = "Veteran Academic Exchange"
 readme = "README.md"
 dependencies = [
   "Django>=5.1,<6.0",
+  "django-environ>=0.14,<0.15",
   "whitenoise>=6.8,<7",
 ]
 authors = [
