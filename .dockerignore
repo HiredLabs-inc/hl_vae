@@ -1,0 +1,25 @@
+# Keep secrets, local state and build output out of the image (DES-003, DES-008).
+.env
+.env.*
+*.sqlite3
+staticfiles/
+
+# Tooling and caches
+.git*
+.idea
+.vscode
+.github
+.venv
+**/__pycache__
+**/*.pyc
+*.egg-info
+.pytest_cache
+.ruff_cache
+.coverage
+htmlcov
+
+# Not needed at runtime
+docs
+infra
+Dockerfile
+.dockerignore
