@@ -9,16 +9,16 @@ https://docs.djangoproject.com/en/5.2/howto/deployment/asgi/
 
 import os
 
-from django.core.exceptions import ImproperlyConfigured
 from django.core.asgi import get_asgi_application
+from django.core.exceptions import ImproperlyConfigured
 
 # No default: a production server must name its environment explicitly
 # (e.g. hl_vae.settings.stage on Cloud Run), so a misconfigured deploy fails
 # at startup instead of running with the wrong settings.
-if not os.environ.get('DJANGO_SETTINGS_MODULE'):
+if not os.environ.get("DJANGO_SETTINGS_MODULE"):
     raise ImproperlyConfigured(
-        'DJANGO_SETTINGS_MODULE must be set, e.g. to hl_vae.settings.stage. '
-        'asgi.py has no default settings module.'
+        "DJANGO_SETTINGS_MODULE must be set, e.g. to hl_vae.settings.stage. "
+        "asgi.py has no default settings module."
     )
 
 application = get_asgi_application()
