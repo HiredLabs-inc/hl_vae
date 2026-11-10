@@ -158,6 +158,13 @@ docker run --rm --network vae -p 8000:8080 \
 
 Then open http://localhost:8000/.
 
+## Deploying to stage
+
+Stage runs on Cloud Run in `hl-vae-stage`. The infrastructure, setup and
+day-2 runbook (promoting, secrets, management commands) are in
+[`infra/README.md`](infra/README.md). In short: merge into `develop`, then
+`git push origin develop:staging` deploys.
+
 ## Design docs
 
 Design work is tracked in [`docs/`](docs/):

@@ -1,6 +1,6 @@
 # DES-008: GCP infrastructure (stage on Cloud Run)
 
-- **Status:** In Progress (step 1: app contract)
+- **Status:** In Progress (step 2 done; bootstrap and apply next)
 - **Area:** Infrastructure
 - **Created:** 2026-11-08
 - **Updated:** 2026-11-10
@@ -262,16 +262,16 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
      `docker build` works and that the container serves locally against
      Postgres via `DATABASE_URL`.
 2. **Terraform skeleton:**
-   - [ ] Add `infra/terraform/{shared,modules/vae-env,envs/stage}` and
+   - [x] Add `infra/terraform/{shared,modules/vae-env,envs/stage}` and
      `infra/cloudbuild/deploy.yaml`.
-   - [ ] Add `infra/README.md` (layout, conventions, day-2 runbook) and
+   - [x] Add `infra/README.md` (layout, conventions, day-2 runbook) and
      `infra/BOOTSTRAP.md` (below).
-   - [ ] Confirm `terraform fmt -check` and `terraform validate` pass for every root.
+   - [x] Confirm `terraform fmt -check` and `terraform validate` pass for every root.
 3. **Bootstrap**, done by the user by hand following `infra/BOOTSTRAP.md`:
-   - [ ] Create project `hl-vae-stage` in the Staging folder and link the billing account.
+   - [x] Create project `hl-vae-stage` in the Staging folder and link the billing account.
    - [ ] Connect the Cloud Build GitHub App to `HiredLabs-inc/hl_vae` in `hl-vae-stage`
      (Console → Cloud Build → Triggers → Connect repository, 1st gen).
-   - [ ] Create the `staging` branch on `origin` from `develop`.
+   - [x] Create the `staging` branch on `origin` from `develop`.
    - [ ] Confirm `gs://hiredlabs-tf-state` access. The bucket already exists; only the `vae/*` prefixes are new.
 4. **Apply:**
    - [ ] `terraform apply` in `infra/terraform/shared`, then in `envs/stage`.
@@ -339,3 +339,11 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
     - with no settings module, the image fails with `ImproperlyConfigured`;
     - `check --deploy` under `hl_vae.settings.stage`, with a fake secret, reports no issues;
     - a built wheel includes `hl_vae/settings/` and `works/migrations/`.
+- 2026-11-10 — Step 1 merged in PR #9. Step 3 progress from the user: `hl-vae-stage` was created with billing linked, and `staging` is on origin.
+- 2026-11-10 — Step 2 (Terraform skeleton) implemented on `feature/terraform-DES-008`. Details:
+  - `shared/` enables compute (which the Shared VPC attachment needs), orgpolicy and artifactregistry on `hl-vae-stage`. It also attaches the project to the staging Shared VPC, relaxes `run.managed.requireInvokerIam` (quota-billed to `hl-vae-stage`), and creates `vae-images`.
+  - `modules/vae-env` is hl_main's `hl-env` minus the worker, Cloud Tasks, media bucket, reminders and Vertex AI. It adds the runtime roles from this doc (`cloudsql.client`, `logging.logWriter`) and DES-003's `secret_managers` variable, which defaults to empty.
+  - `envs/stage` passes `image_repo` and `artifact_repo` as literal values, as hl_main does, rather than reading them from shared state.
+  - Provider locked at `hashicorp/google` 6.50.0, for linux_amd64, darwin_arm64 and darwin_amd64.
+  - Verified: `terraform fmt -check` and `validate` pass for both roots. A read-only `terraform plan -lock=false` against the real project shows 6 resources to add in `shared/` and 33 in `envs/stage`, with no errors. Nothing was applied.
+  - `infra/BOOTSTRAP.md` lists the permissions the person applying needs. It also says `staging` gets its own ruleset (required check, no PR), as DES-005 specifies. Adding `staging` to the develop/main ruleset would reject `git push origin develop:staging`.

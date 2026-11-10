@@ -381,7 +381,7 @@ In two parts, each on a branch off `develop`.
   and `SECRET_KEY_FALLBACKS` read as above.
 - [x] Make sure DES-008's `.dockerignore` lists `.env` and `.env.*`.
 - [x] Add the `load_app_env` tests below.
-- [ ] Add the catalogue and runbook to `infra/README.md`, and the
+- [x] Add the catalogue and runbook to `infra/README.md`, and the
   `secret_managers` variable to `modules/vae-env` (once its value is decided).
 
 ## Testing / Verification
@@ -450,3 +450,4 @@ Manual:
     - `cloud.py` and `stage.py` with a fake secret: a missing required value fails at import, and the secret can't turn `DEBUG` on;
     - a subprocess check that `build.py` needs no env and doesn't import the Google client.
   - Still open, and waiting for DES-008 step 2: the catalogue and runbook in `infra/README.md`, and the `secret_managers` variable.
+- 2026-11-10 — Cloud Run half merged in PR #9. The catalogue and runbook are now in `infra/README.md`, and `modules/vae-env` has the `secret_managers` variable on `feature/terraform-DES-008`. It defaults to `[]`; the open question about who goes in it is still open. The doc stays in `active/` until the stage checks under Testing / Verification have been run after the first deploy.
