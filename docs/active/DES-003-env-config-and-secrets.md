@@ -362,14 +362,14 @@ In two parts, each on a branch off `develop`.
 
 **Local half**, after DES-002 and before DES-008 step 1:
 
-- [ ] Add `django-environ` to `[project] dependencies` in `pyproject.toml`,
+- [x] Add `django-environ` to `[project] dependencies` in `pyproject.toml`,
   and run `uv lock`.
-- [ ] Add `env = environ.Env()` to `base.py`.
-- [ ] Change `dev.py` to the version above: optional `.env`, `DJANGO_DEBUG`,
+- [x] Add `env = environ.Env()` to `base.py`.
+- [x] Change `dev.py` to the version above: optional `.env`, `DJANGO_DEBUG`,
   `DJANGO_SECRET_KEY`, `ALLOWED_HOSTS`, `DATABASE_URL`.
-- [ ] Add `.env.example` and update `.gitignore`.
-- [ ] Add the `.env` and `DATABASE_URL` tests below.
-- [ ] Update `README.md`: copy `.env.example` to `.env` to override dev
+- [x] Add `.env.example` and update `.gitignore`.
+- [x] Add the `.env` and `DATABASE_URL` tests below.
+- [x] Update `README.md`: copy `.env.example` to `.env` to override dev
   settings; nothing is needed by default.
 
 **Cloud Run half**, as part of DES-008 step 1:
@@ -431,3 +431,13 @@ Manual:
 
 - 2026-11-08 — Created.
 - 2026-11-08 — Implementation split into a local half (before DES-008) and a Cloud Run half (with DES-008 step 1). `deterministic_host` is now defined in DES-008's app contract.
+- 2026-11-10 — Local half implemented on `feature/env-config-DES-003`. Details:
+  - Installed `django-environ` 0.14.0 (`>=0.14,<0.15`).
+  - With no `.env`, the dev settings are unchanged. The only difference is that `DATABASES["default"]["NAME"]` is now a string rather than a `Path`.
+  - `dev.py` has no `# noqa: F405` comments, because `pyproject.toml` already ignores F403/F405 in settings (DES-005).
+  - Tests in `works/tests.py`:
+    - they reload `dev.py` with a controlled environment (dev defaults, `DATABASE_URL`, overrides);
+    - one test points `BASE_DIR` at a temp `.env` to show that shell values win over `.env`;
+    - one runs a subprocess with a `.env` in its working directory to show that test settings ignore it.
+  - A `postgres://` `DATABASE_URL` parses correctly, but `manage.py` needs `psycopg`, which DES-008 step 1 adds. `.env.example` and the README say so.
+  - The Cloud Run half stays with DES-008 step 1.
