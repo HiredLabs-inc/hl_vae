@@ -34,16 +34,30 @@ jobs:
         with:
           persist-credentials: false
 
+      # Editing this workflow triggers it, even before DES-008 adds
+      # infra/terraform/. Skip the remaining steps until that directory exists.
+      - name: Check for Terraform code
+        id: tf
+        run: |
+          if [ -d infra/terraform ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::infra/terraform/ doesn't exist yet (DES-008); nothing to check."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Set up Terraform
+        if: steps.tf.outputs.present == 'true'
         uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
           terraform_version: "^1.5.0" # DES-008 requires >= 1.5
 
       - name: Format
+        if: steps.tf.outputs.present == 'true'
         run: terraform fmt -check -recursive infra/terraform
 
       - name: Validate
-        if: success() || failure()
+        if: (success() || failure()) && steps.tf.outputs.present == 'true'
         run: |
           for root in shared envs/stage; do
             echo "::group::terraform validate infra/terraform/$root"

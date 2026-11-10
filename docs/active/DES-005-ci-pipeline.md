@@ -332,4 +332,5 @@ Lands after DES-002 **and DES-006**, on a branch off `develop`.
   - Both workflows check out with `persist-credentials: false`.
   - `terraform.yml` asks for Terraform `^1.5.0`.
   - Actions are pinned to `actions/checkout` v7.0.1, `astral-sh/setup-uv` v10.3.3 and `hashicorp/setup-terraform` v4.0.1.
+  - `terraform.yml` skips its steps, leaving a notice, while `infra/terraform/` doesn't exist. Its path filter includes the workflow file itself, so the PR that adds it (or any later edit before DES-008) triggers it, and without the skip it failed on the missing directory.
   - The cleanup commit's SHA in `.git-blame-ignore-revs` only stays valid if the PR is merged with a merge commit, not squashed or rebased.
