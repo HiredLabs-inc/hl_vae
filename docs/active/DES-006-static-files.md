@@ -1,9 +1,9 @@
 # DES-006: Static files and asset handling
 
-- **Status:** Designed
+- **Status:** In Progress
 - **Area:** Infrastructure
 - **Created:** 2026-11-08
-- **Updated:** 2026-11-08
+- **Updated:** 2026-11-10
 - **Related:** implements the static-files part of the DES-008 app contract (WhiteNoise, `collectstatic` in `docker build`). Builds on DES-002 (settings package, `BASE_DIR` fix) and sits beside DES-003 (`DJANGO_DEBUG` local override). DES-005 runs the tests below. Modeled on `hl_main/hl_main/settings/{base,build,cloud,dev}.py`.
 
 ## Summary
