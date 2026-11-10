@@ -41,7 +41,7 @@ merged.
    `manage.py check` warns `staticfiles.W004`, which fails DES-005's CI. It also
    supplies the WhiteNoise settings, `collectstatic` step and `build.py`
    docstring that DES-008 step 1 needs.
-2. **[DES-005](active/DES-005-ci-pipeline.md) — CI pipeline.** Needs DES-002
+2. **[DES-005](archive/DES-005-ci-pipeline.md) — CI pipeline.** Done (PR #5); `CI / checks` is required on `develop` and `main`. Needs DES-002
    and DES-006, nothing else (it doesn't call GCP). Doing it early means every
    later PR is checked by `CI / checks`, which suits the PR-only rule above,
    and its formatting-only ruff cleanup lands before the bigger changes, so
@@ -66,7 +66,7 @@ merged.
    Cloud CDN from DES-006's deferred options). Not ready to implement.
 
 ```
-DES-002 (done) ─► DES-006 (done) ─► DES-005 ─► DES-003 local ─► DES-008 + DES-003 Cloud Run half ─► DES-009 (needs design)
+DES-002 (done) ─► DES-006 (done) ─► DES-005 (done) ─► DES-003 local ─► DES-008 + DES-003 Cloud Run half ─► DES-009 (needs design)
 ```
 
 ---
@@ -79,7 +79,7 @@ DES-002 (done) ─► DES-006 (done) ─► DES-005 ─► DES-003 local ─► 
 | DES-002 | Settings package (base / dev / stage / prod) | Infrastructure | [doc](archive/DES-002-settings-split.md) | 2026-11-08 | Done |
 | DES-003 | Environment config and secrets management | Infrastructure | [doc](designed/DES-003-env-config-and-secrets.md) | 2026-11-08 | Designed |
 | DES-004 | Database choice (PostgreSQL vs SQLite) | Infrastructure | merged into [DES-008](designed/DES-008-gcp-infrastructure.md) | 2026-11-08 | Dropped |
-| DES-005 | CI pipeline: tests and lint | Infrastructure | [doc](active/DES-005-ci-pipeline.md) | 2026-11-10 | In Progress |
+| DES-005 | CI pipeline: tests and lint | Infrastructure | [doc](archive/DES-005-ci-pipeline.md) | 2026-11-10 | Done |
 | DES-006 | Static files and asset handling | Infrastructure | [doc](archive/DES-006-static-files.md) | 2026-11-10 | Done |
 | DES-007 | Deployment target and process | Infrastructure | merged into [DES-008](designed/DES-008-gcp-infrastructure.md) | 2026-11-08 | Dropped |
 | DES-008 | GCP infrastructure (stage on Cloud Run) | Infrastructure | [doc](designed/DES-008-gcp-infrastructure.md) | 2026-11-08 | Designed |
