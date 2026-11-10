@@ -49,12 +49,12 @@ merged.
    until DES-008 adds `infra/terraform/`. Afterwards the user adds branch
    protection on `develop` and `main` by hand.
 3. **[DES-003](active/DES-003-env-config-and-secrets.md) — local half.**
-   Needs DES-002. Adds `django-environ`, the `env` reader, `.env.example` and
+   Done (PR #8). Needs DES-002. Adds `django-environ`, the `env` reader, `.env.example` and
    `DATABASE_URL` in `dev.py`. Independent of DES-005, so it could swap places
    with step 2, but it's better tested once CI exists. It must land before
    DES-008 step 1, which runs the container against Postgres via
    `DATABASE_URL`.
-4. **[DES-008](designed/DES-008-gcp-infrastructure.md) — GCP infrastructure,
+4. **[DES-008](active/DES-008-gcp-infrastructure.md) — GCP infrastructure,
    together with DES-003's Cloud Run half.** DES-008 step 1 starts only after
    DES-002, DES-006 and DES-003's local half are merged; DES-003's Cloud Run
    half (`load_app_env`, `google-cloud-secret-manager`, the secrets runbook in
@@ -66,7 +66,7 @@ merged.
    Cloud CDN from DES-006's deferred options). Not ready to implement.
 
 ```
-DES-002 (done) ─► DES-006 (done) ─► DES-005 (done) ─► DES-003 local ─► DES-008 + DES-003 Cloud Run half ─► DES-009 (needs design)
+DES-002 (done) ─► DES-006 (done) ─► DES-005 (done) ─► DES-003 local (done) ─► DES-008 + DES-003 Cloud Run half ─► DES-009 (needs design)
 ```
 
 ---
@@ -78,9 +78,9 @@ DES-002 (done) ─► DES-006 (done) ─► DES-005 (done) ─► DES-003 local 
 | DES-001 | Design docs system | Process | [doc](archive/DES-001-design-docs-system.md) | 2026-11-08 | Done |
 | DES-002 | Settings package (base / dev / stage / prod) | Infrastructure | [doc](archive/DES-002-settings-split.md) | 2026-11-08 | Done |
 | DES-003 | Environment config and secrets management | Infrastructure | [doc](active/DES-003-env-config-and-secrets.md) | 2026-11-10 | In Progress |
-| DES-004 | Database choice (PostgreSQL vs SQLite) | Infrastructure | merged into [DES-008](designed/DES-008-gcp-infrastructure.md) | 2026-11-08 | Dropped |
+| DES-004 | Database choice (PostgreSQL vs SQLite) | Infrastructure | merged into [DES-008](active/DES-008-gcp-infrastructure.md) | 2026-11-08 | Dropped |
 | DES-005 | CI pipeline: tests and lint | Infrastructure | [doc](archive/DES-005-ci-pipeline.md) | 2026-11-10 | Done |
 | DES-006 | Static files and asset handling | Infrastructure | [doc](archive/DES-006-static-files.md) | 2026-11-10 | Done |
-| DES-007 | Deployment target and process | Infrastructure | merged into [DES-008](designed/DES-008-gcp-infrastructure.md) | 2026-11-08 | Dropped |
-| DES-008 | GCP infrastructure (stage on Cloud Run) | Infrastructure | [doc](designed/DES-008-gcp-infrastructure.md) | 2026-11-08 | Designed |
+| DES-007 | Deployment target and process | Infrastructure | merged into [DES-008](active/DES-008-gcp-infrastructure.md) | 2026-11-08 | Dropped |
+| DES-008 | GCP infrastructure (stage on Cloud Run) | Infrastructure | [doc](active/DES-008-gcp-infrastructure.md) | 2026-11-10 | In Progress |
 | DES-009 | Custom domain: veteranacademicexchange.org | Infrastructure | | 2026-11-08 | Idea |

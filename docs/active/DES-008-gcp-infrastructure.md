@@ -1,9 +1,9 @@
 # DES-008: GCP infrastructure (stage on Cloud Run)
 
-- **Status:** Designed
+- **Status:** In Progress (step 1: app contract)
 - **Area:** Infrastructure
 - **Created:** 2026-11-08
-- **Updated:** 2026-11-08
+- **Updated:** 2026-11-10
 - **Related:** supersedes DES-004 and DES-007. Follow-ups: DES-002, DES-003, DES-005, DES-006, DES-009. Modeled on `hl_main/infra/` (`TARGET_DESIGN.md`, `README.md`).
 
 ## Summary
@@ -240,16 +240,16 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
    hardcoded `SECRET_KEY` removed), WhiteNoise and the static settings, the
    `env` reader, `DATABASE_URL` in `dev.py`, and `.env.example`. This step adds
    only what's specific to Cloud Run:
-   - [ ] Add `gunicorn` and `psycopg[binary]` to the dependencies.
+   - [x] Add `gunicorn` and `psycopg[binary]` to the dependencies.
      (`django-environ` and `whitenoise` arrive with DES-003 and DES-006;
      `google-cloud-secret-manager` is added here with the loader, per DES-003.)
-   - [ ] Add `hl_vae/cloudrun.py` with `deterministic_host` (above) and
+   - [x] Add `hl_vae/cloudrun.py` with `deterministic_host` (above) and
      `load_app_env` (DES-003).
-   - [ ] Add `hl_vae/settings/cloud.py`: secret loading and `SECRET_KEY` per
+   - [x] Add `hl_vae/settings/cloud.py`: secret loading and `SECRET_KEY` per
      DES-003, then hosts, CSRF origins, Postgres and the secure-cookie, HSTS
      and SSL-proxy settings. Switch `stage.py` to `from .cloud import *`.
-   - [ ] Add `hl_vae/settings/build.py` with the docstring from DES-006.
-   - [ ] Fix `[tool.setuptools]` in `pyproject.toml` before the Dockerfile.
+   - [x] Add `hl_vae/settings/build.py` with the docstring from DES-006.
+   - [x] Fix `[tool.setuptools]` in `pyproject.toml` before the Dockerfile.
      It lists `packages = ["hl_vae", "works"]` explicitly, so a built wheel
      leaves out `hl_vae/settings/` and `works/migrations/` (checked against
      the DES-002 code, 2026-11-08). Running from the repo or from an editable
@@ -257,7 +257,7 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
      `uv sync --no-editable`) would fail with no settings module. Switch to
      `[tool.setuptools.packages.find]` with `include = ["hl_vae*", "works*"]`,
      or list the subpackages.
-   - [ ] Add a `Dockerfile` (with DES-006's `collectstatic` step) and a
+   - [x] Add a `Dockerfile` (with DES-006's `collectstatic` step) and a
      `.dockerignore` listing `staticfiles/`, `.env` and `.env.*`. Check that
      `docker build` works and that the container serves locally against
      Postgres via `DATABASE_URL`.
@@ -312,10 +312,11 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
 - ~~Custom domain later?~~ **Answered:** yes, the intent is
   `veteranacademicexchange.org`, but it depends on real-world factors.
   Tracked as **DES-009** (Idea).
-- Will the image install the project non-editable? If so, the
-  `[tool.setuptools]` fix in step 1 is required, not optional. Either way,
-  `docker build` in step 1 should confirm `hl_vae.settings.stage` imports
-  inside the container.
+- ~~Will the image install the project non-editable?~~ **Answered (step 1):**
+  no. The image installs only the dependencies (`uv sync --frozen
+  --no-install-project`) and runs the code from `/app`, so `BASE_DIR` and
+  `STATIC_ROOT` are under `/app`. The `[tool.setuptools]` fix was made anyway,
+  and `hl_vae.settings.stage` resolves inside the container.
 - At the first `envs/stage` apply, confirm `vae-stage-sql` gets an address in
   `sql-dev` (10.0.32.0/24). If the producer subnet can't take it, allocate a
   second range on `vpc-staging-shared` in `shared/`.
@@ -326,3 +327,15 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
 - 2026-11-08 — Cloud Run now uses `hl_vae.settings.stage` (which imports `cloud`), following the DES-002 layout.
 - 2026-11-08 — Step 1 narrowed to the Cloud Run-specific pieces; DES-002, DES-006 and DES-003's local half land first. Added `hl_vae/cloudrun.py` (`deterministic_host`, `load_app_env`) to the app contract. `build.py` inherits static settings (DES-006).
 - 2026-11-08 — Noted from the DES-002 implementation: `[tool.setuptools] packages` leaves `hl_vae.settings` and `works.migrations` out of a built wheel. Added a fix to step 1 and an open question.
+- 2026-11-10 — Step 1 (app contract) implemented on `feature/cloud-run-app-DES-008`, together with DES-003's Cloud Run half. Details:
+  - Installed `gunicorn` 26.2.0 (`>=26.2,<27`; 27.0.0 was released the same day, so it was skipped), `psycopg[binary]` 3.3.8 and `google-cloud-secret-manager` 2.32.0.
+  - `cloud.py` follows `hl_main/settings/cloud.py`, minus hl_main's app-specific values. It also silences `security.W021` (HSTS preload is off on purpose), so `check --deploy` reports no warnings.
+  - `cloudrun.py` puts the Secret Manager client behind `_secret_client()` so tests can swap in a fake.
+  - Dockerfile: `python:3.12-slim` plus uv 0.13.1. It installs the dependencies only (see Open Questions) and runs as a non-root `app` user. gunicorn runs with `--no-control-socket`: gunicorn 26 otherwise tries to create a control socket in the home directory, which this user doesn't have. `DJANGO_SETTINGS_MODULE` isn't set in the image.
+  - Verified locally:
+    - the image builds and contains no `.env`;
+    - against `postgres:15`, `migrate` runs, and `/` and `/admin/login/` return 200;
+    - admin CSS is served hashed, gzipped and `immutable`;
+    - with no settings module, the image fails with `ImproperlyConfigured`;
+    - `check --deploy` under `hl_vae.settings.stage`, with a fake secret, reports no issues;
+    - a built wheel includes `hl_vae/settings/` and `works/migrations/`.

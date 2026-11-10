@@ -1,6 +1,6 @@
 # DES-003: Environment config and secrets management
 
-- **Status:** In Progress (local half)
+- **Status:** In Progress (Cloud Run half)
 - **Area:** Infrastructure
 - **Created:** 2026-11-08
 - **Updated:** 2026-11-10
@@ -374,13 +374,13 @@ In two parts, each on a branch off `develop`.
 
 **Cloud Run half**, as part of DES-008 step 1:
 
-- [ ] Add `google-cloud-secret-manager` to `[project] dependencies`, and run
+- [x] Add `google-cloud-secret-manager` to `[project] dependencies`, and run
   `uv lock`.
-- [ ] Add `load_app_env` to `hl_vae/cloudrun.py` (next to `deterministic_host`,
+- [x] Add `load_app_env` to `hl_vae/cloudrun.py` (next to `deterministic_host`,
   per the DES-008 app contract), and call it from `cloud.py` with `SECRET_KEY`
   and `SECRET_KEY_FALLBACKS` read as above.
-- [ ] Make sure DES-008's `.dockerignore` lists `.env` and `.env.*`.
-- [ ] Add the `load_app_env` tests below.
+- [x] Make sure DES-008's `.dockerignore` lists `.env` and `.env.*`.
+- [x] Add the `load_app_env` tests below.
 - [ ] Add the catalogue and runbook to `infra/README.md`, and the
   `secret_managers` variable to `modules/vae-env` (once its value is decided).
 
@@ -441,3 +441,12 @@ Manual:
     - one runs a subprocess with a `.env` in its working directory to show that test settings ignore it.
   - A `postgres://` `DATABASE_URL` parses correctly, but `manage.py` needs `psycopg`, which DES-008 step 1 adds. `.env.example` and the README say so.
   - The Cloud Run half stays with DES-008 step 1.
+- 2026-11-10 — Local half done (PR #8). Cloud Run half implemented with DES-008 step 1 on `feature/cloud-run-app-DES-008`. Details:
+  - Installed `google-cloud-secret-manager` 2.32.0.
+  - `load_app_env` matches the design. The client is created in a small `_secret_client()` helper so tests can swap in a fake.
+  - `cloud.py` also drops empty entries from `DJANGO_SECRET_KEY_FALLBACKS` and `ALLOWED_HOSTS`, since the blob sets `ALLOWED_HOSTS=` empty on stage.
+  - Tests are in `hl_vae/tests/`:
+    - `load_app_env`: loading, existing values win, and the error names the secret path;
+    - `cloud.py` and `stage.py` with a fake secret: a missing required value fails at import, and the secret can't turn `DEBUG` on;
+    - a subprocess check that `build.py` needs no env and doesn't import the Google client.
+  - Still open, and waiting for DES-008 step 2: the catalogue and runbook in `infra/README.md`, and the `secret_managers` variable.
