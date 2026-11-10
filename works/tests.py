@@ -24,12 +24,8 @@ class StaticFilesTests(SimpleTestCase):
         # The same storage the Docker build uses (test.py swaps it out), so a
         # broken CSS url() or a missing file fails here as it would in the build.
         with tempfile.TemporaryDirectory() as tmp:
-            storages = {
-                **settings.STORAGES,
-                "staticfiles": {
-                    "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-                },
-            }
+            manifest = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+            storages = {**settings.STORAGES, "staticfiles": {"BACKEND": manifest}}
             with override_settings(STATIC_ROOT=tmp, STORAGES=storages):
                 call_command("collectstatic", interactive=False, verbosity=0)
 

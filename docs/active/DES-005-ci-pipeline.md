@@ -1,9 +1,9 @@
 # DES-005: CI pipeline (tests and lint)
 
-- **Status:** Designed
+- **Status:** In Progress
 - **Area:** Infrastructure
 - **Created:** 2026-11-08
-- **Updated:** 2026-11-08
+- **Updated:** 2026-11-10
 - **Related:** depends on DES-002 (`hl_vae.settings.test`, pytest config, smoke test). Complements DES-008 (Cloud Build deploys `staging`; this checks code before it gets there, and lints `infra/terraform`). Branch `design/ci-pipeline-005`.
 
 ## Summary
@@ -281,15 +281,15 @@ Lands after DES-002 **and DES-006**, on a branch off `develop`.
 > fails until DES-006 adds `static/.gitkeep`. Land DES-006 first, or this PR
 > starts red.
 
-- [ ] Add `ruff` and `pytest-cov` to the `dev` extra; run `uv lock`.
-- [ ] Add `[tool.ruff]`, `[tool.ruff.lint]`, `[tool.coverage.run]` and the
+- [x] Add `ruff` and `pytest-cov` to the `dev` extra; run `uv lock`.
+- [x] Add `[tool.ruff]`, `[tool.ruff.lint]`, `[tool.coverage.run]` and the
   extra pytest options to `pyproject.toml`.
-- [ ] Commit the formatting-only cleanup on its own, then add its SHA to
+- [x] Commit the formatting-only cleanup on its own, then add its SHA to
   `.git-blame-ignore-revs` in the next commit.
-- [ ] Add `.github/workflows/ci.yml` with job `checks`.
-- [ ] Add `.github/workflows/terraform.yml` (dormant until `infra/terraform/` exists).
-- [ ] Add the local check command and a CI section to `README.md`.
-- [ ] Open the PR and confirm `CI / checks` runs and passes.
+- [x] Add `.github/workflows/ci.yml` with job `checks`.
+- [x] Add `.github/workflows/terraform.yml` (dormant until `infra/terraform/` exists).
+- [x] Add the local check command and a CI section to `README.md`.
+- [x] Open the PR and confirm `CI / checks` runs and passes.
 - [ ] **By hand (user):** add branch protection on `develop` and `main`
   requiring `CI / checks`. Add the `staging` rule when DES-008's bootstrap
   creates the branch.
@@ -326,3 +326,17 @@ Lands after DES-002 **and DES-006**, on a branch off `develop`.
 
 - 2026-11-08 — Created.
 - 2026-11-08 — Noted from the DES-002 implementation: step 6 fails on `staticfiles.W004` until DES-006 lands, so this now lands after DES-006 too.
+- 2026-11-10 — Implementation started on `feature/ci-pipeline-DES-005`. Installed ruff 0.17.4 and pytest-cov 7.1.0, with bounded ranges in `pyproject.toml` (`ruff>=0.17.4,<0.18`, because minor releases can change formatting). Changes from the design:
+  - `extend-exclude` adds `*.md`, because ruff 0.17 formats Python code blocks inside Markdown and would rewrite the design docs.
+  - Two long lines that `ruff check --fix` can't fix were handled by hand in a separate commit after the cleanup commit: a `# noqa: E501` on Django's `UserAttributeSimilarityValidator` path, and a rewrapped line in `works/tests.py`.
+  - Both workflows check out with `persist-credentials: false`.
+  - `terraform.yml` asks for Terraform `^1.5.0`.
+  - Actions are pinned to `actions/checkout` v7.0.1, `astral-sh/setup-uv` v10.3.3 and `hashicorp/setup-terraform` v4.0.1.
+  - `terraform.yml` skips its steps, leaving a notice, while `infra/terraform/` doesn't exist. Its path filter includes the workflow file itself, so the PR that adds it (or any later edit before DES-008) triggers it, and without the skip it failed on the missing directory.
+  - The cleanup commit's SHA in `.git-blame-ignore-revs` only stays valid if the PR is merged with a merge commit, not squashed or rebased.
+- 2026-11-10 — Verified on GitHub:
+  - `CI / checks` passed on PR #5 in about 10 s.
+  - `Terraform` ran and skipped cleanly.
+  - A throwaway draft PR (#6, closed, branch deleted) carried an unformatted file, an unused import, a model with no migration and a failing assertion. Format, Lint, Migrations and Tests all failed in the same run, and Lint posted inline annotations (F401, I001, DJ008).
+  - A stale `uv.lock` fails `uv sync --locked`, checked locally.
+  - Still open: the docs-only PR check, the push to `develop`, and the `staging` push rejection. Those wait for the merge and for branch protection.
