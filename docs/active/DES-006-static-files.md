@@ -1,9 +1,9 @@
 # DES-006: Static files and asset handling
 
-- **Status:** Designed
+- **Status:** In Progress
 - **Area:** Infrastructure
 - **Created:** 2026-11-08
-- **Updated:** 2026-11-08
+- **Updated:** 2026-11-10
 - **Related:** implements the static-files part of the DES-008 app contract (WhiteNoise, `collectstatic` in `docker build`). Builds on DES-002 (settings package, `BASE_DIR` fix) and sits beside DES-003 (`DJANGO_DEBUG` local override). DES-005 runs the tests below. Modeled on `hl_main/hl_main/settings/{base,build,cloud,dev}.py`.
 
 ## Summary
@@ -281,16 +281,16 @@ Django 5.2.
 Lands with or right after DES-002, and before DES-008 step 1 needs
 `collectstatic` in the Dockerfile.
 
-- [ ] Add `whitenoise>=6.8,<7` to `pyproject.toml` and `uv lock`.
-- [ ] Create `static/.gitkeep`.
-- [ ] In `base.py`: replace the static block with the one above, add
+- [x] Add `whitenoise>=6.8,<7` to `pyproject.toml` and `uv lock`.
+- [x] Create `static/.gitkeep`.
+- [x] In `base.py`: replace the static block with the one above, add
   `whitenoise.runserver_nostatic` and `WhiteNoiseMiddleware`.
-- [ ] In `test.py`: add the `STORAGES` override and `WHITENOISE_AUTOREFRESH`.
-- [ ] Add `staticfiles/` to `.gitignore`.
-- [ ] Give DES-008 the `collectstatic` Dockerfile step, the `.dockerignore`
+- [x] In `test.py`: add the `STORAGES` override and `WHITENOISE_AUTOREFRESH`.
+- [x] Add `staticfiles/` to `.gitignore`.
+- [x] Give DES-008 the `collectstatic` Dockerfile step, the `.dockerignore`
   entry and the `build.py` docstring.
-- [ ] Add the tests below to `works/tests.py`, next to DES-002's smoke test.
-- [ ] README: a short "Static files" section — where to put assets, that dev
+- [x] Add the tests below to `works/tests.py`, next to DES-002's smoke test.
+- [x] README: a short "Static files" section — where to put assets, that dev
   needs no `collectstatic`, and that it's needed when running with
   `DJANGO_DEBUG=false`.
 
@@ -338,3 +338,4 @@ Lands with or right after DES-002, and before DES-008 step 1 needs
 ## Changelog
 
 - 2026-11-08 — Created. Confirmed `static/` doesn't exist and `static_main/` isn't gitignored; compared with hl_main's duplicated static settings.
+- 2026-11-10 — Implementation started on `feature/static-files-DES-006`. All plan items done; the DES-008 item needed no change (DES-008 step 1 already lists the `collectstatic` step, the `.dockerignore` entry and the `build.py` docstring). Installed `whitenoise` 6.12.0. `test_manifest_build` uses a `tempfile` directory rather than pytest's `tmp_path`, because the suite uses Django `TestCase` classes. Verified locally: `check` has no `staticfiles.W004`, `collectstatic` writes the gitignored `staticfiles/`, `runserver` serves admin CSS through WhiteNoise without `collectstatic`, and a CSS `url()` to a missing file fails `test_manifest_build`. The `docker build` and stage checks wait for DES-008.

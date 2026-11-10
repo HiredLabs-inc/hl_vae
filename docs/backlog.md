@@ -36,7 +36,7 @@ Reviewed 2026-11-10 across every *Designed* doc. Each step is its own branch
 off `develop` and its own PR; start a step only after the previous one is
 merged.
 
-1. **[DES-006](designed/DES-006-static-files.md) — Static files.** Depends only
+1. **[DES-006](active/DES-006-static-files.md) — Static files.** Depends only
    on DES-002 (done). Goes first because it adds `static/.gitkeep`: until then
    `manage.py check` warns `staticfiles.W004`, which fails DES-005's CI. It also
    supplies the WhiteNoise settings, `collectstatic` step and `build.py`
@@ -80,7 +80,7 @@ DES-002 (done) ─► DES-006 ─► DES-005 ─► DES-003 local ─► DES-008
 | DES-003 | Environment config and secrets management | Infrastructure | [doc](designed/DES-003-env-config-and-secrets.md) | 2026-11-08 | Designed |
 | DES-004 | Database choice (PostgreSQL vs SQLite) | Infrastructure | merged into [DES-008](designed/DES-008-gcp-infrastructure.md) | 2026-11-08 | Dropped |
 | DES-005 | CI pipeline: tests and lint | Infrastructure | [doc](designed/DES-005-ci-pipeline.md) | 2026-11-08 | Designed |
-| DES-006 | Static files and asset handling | Infrastructure | [doc](designed/DES-006-static-files.md) | 2026-11-08 | Designed |
+| DES-006 | Static files and asset handling | Infrastructure | [doc](active/DES-006-static-files.md) | 2026-11-10 | In Progress |
 | DES-007 | Deployment target and process | Infrastructure | merged into [DES-008](designed/DES-008-gcp-infrastructure.md) | 2026-11-08 | Dropped |
 | DES-008 | GCP infrastructure (stage on Cloud Run) | Infrastructure | [doc](designed/DES-008-gcp-infrastructure.md) | 2026-11-08 | Designed |
 | DES-009 | Custom domain: veteranacademicexchange.org | Infrastructure | | 2026-11-08 | Idea |

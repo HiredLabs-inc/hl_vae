@@ -14,3 +14,15 @@ DATABASES = {
 }
 
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
+# No collectstatic in tests: plain storage, so {% static %} doesn't need a
+# manifest. test_manifest_build checks the real manifest build separately.
+STORAGES = {
+    **STORAGES,  # noqa: F405
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+# DEBUG is False here, so WhiteNoise would warn "No directory at: …/staticfiles/"
+# on every test run. Autorefresh mode skips that check and serves from finders.
+WHITENOISE_AUTOREFRESH = True

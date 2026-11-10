@@ -46,6 +46,30 @@ the variable, for example:
 DJANGO_SETTINGS_MODULE=hl_vae.settings.test uv run python manage.py check
 ```
 
+## Static files
+
+Static files are served by [WhiteNoise](https://whitenoise.readthedocs.io/) in
+every environment (DES-006 in the [backlog](docs/backlog.md)). The
+settings live once in `hl_vae/settings/base.py`; don't override them per
+environment.
+
+- **Project-wide assets** (site CSS, logo, favicon) go in `static/vae/…`,
+  e.g. `static/vae/css/site.css`.
+- **App-specific assets** go in `<app>/static/<app>/…`, e.g.
+  `works/static/works/…`.
+- Reference them in templates with `{% load static %}` and `{% static 'vae/css/site.css' %}`.
+
+`runserver` needs no `collectstatic`: with `DEBUG = True`, WhiteNoise serves
+files straight from their source directories. With `DEBUG` off (for example
+the `DJANGO_DEBUG=false` override from DES-003), run this first:
+
+```bash
+uv run python manage.py collectstatic --noinput
+```
+
+It writes hashed, gzipped copies to `staticfiles/`, which is gitignored. On
+stage, `collectstatic` runs during `docker build`.
+
 ## Design docs
 
 Design work is tracked in [`docs/`](docs/):
