@@ -1,9 +1,9 @@
 # DES-005: CI pipeline (tests and lint)
 
-- **Status:** Designed
+- **Status:** In Progress
 - **Area:** Infrastructure
 - **Created:** 2026-11-08
-- **Updated:** 2026-11-08
+- **Updated:** 2026-11-10
 - **Related:** depends on DES-002 (`hl_vae.settings.test`, pytest config, smoke test). Complements DES-008 (Cloud Build deploys `staging`; this checks code before it gets there, and lints `infra/terraform`). Branch `design/ci-pipeline-005`.
 
 ## Summary
