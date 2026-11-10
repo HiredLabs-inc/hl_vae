@@ -26,6 +26,10 @@ VAE's one hosted environment, **stage**, on Google Cloud (DES-008 in the
   `terraform providers lock -platform=linux_amd64 -platform=darwin_arm64 -platform=darwin_amd64`.
 - CI runs `terraform fmt -check` and `validate` on every root (no backend, no
   credentials). `plan` and `apply` are run by hand.
+- `terraform init` creates `.terraform/` in each root. It's ignored by
+  `infra/terraform/.gitignore`, so on a branch from before that file existed,
+  git lists it as untracked. That's harmless: don't stash or commit it; it's
+  ignored again once you're back on a current branch.
 
 ## What's in stage
 
@@ -87,10 +91,11 @@ Then, using the values from `terraform output env`:
    ```
 
 3. **First deploy.** The trigger reads `infra/cloudbuild/deploy.yaml` from
-   GitHub, so it has to be on `staging` first. Promote `develop`:
+   GitHub, so it has to be on `staging` first. Promote `develop` from
+   GitHub (see *Promote to stage*):
 
    ```bash
-   git push origin develop:staging
+   git fetch origin && git push origin origin/develop:staging
    ```
 
    After that, a deploy can be re-run by hand:
@@ -107,7 +112,17 @@ Then, using the values from `terraform output env`:
 ## Day 2
 
 **Promote to stage.** Pushes to `develop` don't deploy. To deploy what's on
-`develop`, fast-forward `staging` to it: `git push origin develop:staging`.
+`develop`, fast-forward `staging` to GitHub's `develop`:
+
+```bash
+git fetch origin && git push origin origin/develop:staging
+```
+
+Push `origin/develop`, not your local `develop`. That promotes exactly the
+commit that was merged and checked by CI, however stale your local branch is.
+(The first deploy failed with `File infra/cloudbuild/deploy.yaml not found`
+because a local `develop` from before PR #10 was pushed.) The `staging`
+ruleset rejects the push unless `CI / checks` passed on that commit.
 
 **Run a management command.** `vae-stage-manage` takes the command as args:
 

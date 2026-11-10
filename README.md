@@ -163,7 +163,7 @@ Then open http://localhost:8000/.
 Stage runs on Cloud Run in `hl-vae-stage`. The infrastructure, setup and
 day-2 runbook (promoting, secrets, management commands) are in
 [`infra/README.md`](infra/README.md). In short: merge into `develop`, then
-`git push origin develop:staging` deploys.
+`git fetch origin && git push origin origin/develop:staging` deploys.
 
 ## Design docs
 

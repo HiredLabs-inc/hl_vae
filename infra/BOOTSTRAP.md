@@ -43,7 +43,7 @@ The person running the bootstrap and the first applies needs:
    require the status check `checks` (GitHub Actions), block deletion and
    force-pushes, and **don't** require a pull request. Don't add `staging` to
    the "Protect develop and main" ruleset: its pull-request rule would reject
-   the promotion push. With this rule, `git push origin develop:staging`
+   the promotion push. With this rule, `git push origin origin/develop:staging`
    is accepted only when the commit has already passed `CI / checks` on
    `develop`.
 
