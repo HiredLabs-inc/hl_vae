@@ -289,7 +289,7 @@ Lands after DES-002 **and DES-006**, on a branch off `develop`.
 - [x] Add `.github/workflows/ci.yml` with job `checks`.
 - [x] Add `.github/workflows/terraform.yml` (dormant until `infra/terraform/` exists).
 - [x] Add the local check command and a CI section to `README.md`.
-- [ ] Open the PR and confirm `CI / checks` runs and passes.
+- [x] Open the PR and confirm `CI / checks` runs and passes.
 - [ ] **By hand (user):** add branch protection on `develop` and `main`
   requiring `CI / checks`. Add the `staging` rule when DES-008's bootstrap
   creates the branch.
@@ -334,3 +334,9 @@ Lands after DES-002 **and DES-006**, on a branch off `develop`.
   - Actions are pinned to `actions/checkout` v7.0.1, `astral-sh/setup-uv` v10.3.3 and `hashicorp/setup-terraform` v4.0.1.
   - `terraform.yml` skips its steps, leaving a notice, while `infra/terraform/` doesn't exist. Its path filter includes the workflow file itself, so the PR that adds it (or any later edit before DES-008) triggers it, and without the skip it failed on the missing directory.
   - The cleanup commit's SHA in `.git-blame-ignore-revs` only stays valid if the PR is merged with a merge commit, not squashed or rebased.
+- 2026-11-10 — Verified on GitHub:
+  - `CI / checks` passed on PR #5 in about 10 s.
+  - `Terraform` ran and skipped cleanly.
+  - A throwaway draft PR (#6, closed, branch deleted) carried an unformatted file, an unused import, a model with no migration and a failing assertion. Format, Lint, Migrations and Tests all failed in the same run, and Lint posted inline annotations (F401, I001, DJ008).
+  - A stale `uv.lock` fails `uv sync --locked`, checked locally.
+  - Still open: the docs-only PR check, the push to `develop`, and the `staging` push rejection. Those wait for the merge and for branch protection.
