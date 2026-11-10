@@ -17,9 +17,17 @@ See https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+import environ
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # hl_vae/settings/base.py -> repo root.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+# The one environment reader (DES-003). Every settings module reads config
+# through `env(...)`, `env.bool(...)`, `env.list(...)` and so on, never
+# os.environ directly. Settings modules are the only code that reads the
+# environment; app code reads django.conf.settings. base.py reads nothing.
+env = environ.Env()
 
 
 # SECRET_KEY is deliberately not set: each environment module must provide one.
