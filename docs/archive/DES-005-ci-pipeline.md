@@ -1,6 +1,6 @@
 # DES-005: CI pipeline (tests and lint)
 
-- **Status:** In Progress
+- **Status:** Done
 - **Area:** Infrastructure
 - **Created:** 2026-11-08
 - **Updated:** 2026-11-10
@@ -290,9 +290,10 @@ Lands after DES-002 **and DES-006**, on a branch off `develop`.
 - [x] Add `.github/workflows/terraform.yml` (dormant until `infra/terraform/` exists).
 - [x] Add the local check command and a CI section to `README.md`.
 - [x] Open the PR and confirm `CI / checks` runs and passes.
-- [ ] **By hand (user):** add branch protection on `develop` and `main`
-  requiring `CI / checks`. Add the `staging` rule when DES-008's bootstrap
-  creates the branch.
+- [x] **By hand (user):** add branch protection on `develop` and `main`
+  requiring `CI / checks`. The `staging` rule is still to do. It's added when
+  DES-008's bootstrap creates the branch (step 4 of the backlog's
+  implementation order).
 
 ## Testing / Verification
 
@@ -340,3 +341,4 @@ Lands after DES-002 **and DES-006**, on a branch off `develop`.
   - A throwaway draft PR (#6, closed, branch deleted) carried an unformatted file, an unused import, a model with no migration and a failing assertion. Format, Lint, Migrations and Tests all failed in the same run, and Lint posted inline annotations (F401, I001, DJ008).
   - A stale `uv.lock` fails `uv sync --locked`, checked locally.
   - Still open: the docs-only PR check, the push to `develop`, and the `staging` push rejection. Those wait for the merge and for branch protection.
+- 2026-11-10 — Done. Merged into `develop` in PR #5 as a merge commit, so `b1972f8` in `.git-blame-ignore-revs` still matches. On that push, `CI` and `Terraform` passed. The user added `required_status_checks` (`checks`, GitHub Actions app) to the existing "Protect develop and main" ruleset. That ruleset also requires branches to be up to date and allows only merge commits. Archived.
