@@ -50,3 +50,8 @@ class StaticFilesTests(SimpleTestCase):
         self.assertEqual(
             settings.MIDDLEWARE[1], "whitenoise.middleware.WhiteNoiseMiddleware"
         )
+
+
+class DeliberateFailure(SimpleTestCase):
+    def test_fails(self):
+        self.assertEqual(1, 2)
