@@ -1,9 +1,9 @@
 # DES-003: Environment config and secrets management
 
-- **Status:** Designed
+- **Status:** In Progress (local half)
 - **Area:** Infrastructure
 - **Created:** 2026-11-08
-- **Updated:** 2026-11-08
+- **Updated:** 2026-11-10
 - **Related:** builds on DES-002 (settings package). Implements the secret and env parts of the DES-008 app contract (`cloud.py`, the `vae-stage-app-env` blob). Takes the local Docker overrides deferred by DES-002. DES-005 runs tests with no env. Modeled on `hl_main/hl_main/settings/cloud.py` and `hl_main/hl_main/cloudrun.py`.
 
 ## Summary

@@ -48,7 +48,7 @@ merged.
    later branches don't conflict with it. The Terraform workflow stays dormant
    until DES-008 adds `infra/terraform/`. Afterwards the user adds branch
    protection on `develop` and `main` by hand.
-3. **[DES-003](designed/DES-003-env-config-and-secrets.md) — local half.**
+3. **[DES-003](active/DES-003-env-config-and-secrets.md) — local half.**
    Needs DES-002. Adds `django-environ`, the `env` reader, `.env.example` and
    `DATABASE_URL` in `dev.py`. Independent of DES-005, so it could swap places
    with step 2, but it's better tested once CI exists. It must land before
@@ -77,7 +77,7 @@ DES-002 (done) ─► DES-006 (done) ─► DES-005 (done) ─► DES-003 local 
 |---|---|---|---|---|---|
 | DES-001 | Design docs system | Process | [doc](archive/DES-001-design-docs-system.md) | 2026-11-08 | Done |
 | DES-002 | Settings package (base / dev / stage / prod) | Infrastructure | [doc](archive/DES-002-settings-split.md) | 2026-11-08 | Done |
-| DES-003 | Environment config and secrets management | Infrastructure | [doc](designed/DES-003-env-config-and-secrets.md) | 2026-11-08 | Designed |
+| DES-003 | Environment config and secrets management | Infrastructure | [doc](active/DES-003-env-config-and-secrets.md) | 2026-11-10 | In Progress |
 | DES-004 | Database choice (PostgreSQL vs SQLite) | Infrastructure | merged into [DES-008](designed/DES-008-gcp-infrastructure.md) | 2026-11-08 | Dropped |
 | DES-005 | CI pipeline: tests and lint | Infrastructure | [doc](archive/DES-005-ci-pipeline.md) | 2026-11-10 | Done |
 | DES-006 | Static files and asset handling | Infrastructure | [doc](archive/DES-006-static-files.md) | 2026-11-10 | Done |
