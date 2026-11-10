@@ -1,6 +1,6 @@
 # DES-008: GCP infrastructure (stage on Cloud Run)
 
-- **Status:** In Progress (step 2 done; bootstrap and apply next)
+- **Status:** Done
 - **Area:** Infrastructure
 - **Created:** 2026-11-08
 - **Updated:** 2026-11-10
@@ -33,7 +33,7 @@ redesigning anything.
 
 - A reproducible stage environment, defined in Terraform and reviewed in git.
 - A push to `staging` builds, migrates and deploys. `develop` is promoted with
-  `git push origin develop:staging`.
+  `git push origin origin/develop:staging`.
 - No service account keys anywhere, and no secrets or passwords in Terraform state.
 - Scale to zero. The database is stopped when nobody is testing.
 - Decide DES-004 (database) and DES-007 (deploy target), and define the
@@ -269,20 +269,20 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
    - [x] Confirm `terraform fmt -check` and `terraform validate` pass for every root.
 3. **Bootstrap**, done by the user by hand following `infra/BOOTSTRAP.md`:
    - [x] Create project `hl-vae-stage` in the Staging folder and link the billing account.
-   - [ ] Connect the Cloud Build GitHub App to `HiredLabs-inc/hl_vae` in `hl-vae-stage`
+   - [x] Connect the Cloud Build GitHub App to `HiredLabs-inc/hl_vae` in `hl-vae-stage`
      (Console → Cloud Build → Triggers → Connect repository, 1st gen).
    - [x] Create the `staging` branch on `origin` from `develop`.
-   - [ ] Confirm `gs://hiredlabs-tf-state` access. The bucket already exists; only the `vae/*` prefixes are new.
+   - [x] Confirm `gs://hiredlabs-tf-state` access. The bucket already exists; only the `vae/*` prefixes are new.
 4. **Apply:**
-   - [ ] `terraform apply` in `infra/terraform/shared`, then in `envs/stage`.
+   - [x] `terraform apply` in `infra/terraform/shared`, then in `envs/stage`.
 5. **Out-of-band secrets:**
-   - [ ] `gcloud sql users create vae --instance=vae-stage-sql --password=... --project=hl-vae-stage`.
-   - [ ] Write the `.env`, run `gcloud secrets versions add vae-stage-app-env --data-file=.env`,
+   - [x] `gcloud sql users create vae --instance=vae-stage-sql --password=... --project=hl-vae-stage`.
+   - [x] Write the `.env`, run `gcloud secrets versions add vae-stage-app-env --data-file=.env`,
      and delete the local file.
 6. **First deploy:**
-   - [ ] Promote `develop` to `staging` (`git push origin develop:staging`), with
+   - [x] Promote `develop` to `staging` (`git push origin origin/develop:staging`), with
      `infra/cloudbuild/deploy.yaml` already on `develop`.
-   - [ ] Smoke-test the `run.app` URL.
+   - [x] Smoke-test the `run.app` URL.
 7. **Lifecycle check:**
    - [ ] The next morning, confirm `vae-stage-sql` was stopped by the scheduler.
    - [ ] Confirm the next deploy starts it again.
@@ -317,9 +317,9 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
   --no-install-project`) and runs the code from `/app`, so `BASE_DIR` and
   `STATIC_ROOT` are under `/app`. The `[tool.setuptools]` fix was made anyway,
   and `hl_vae.settings.stage` resolves inside the container.
-- At the first `envs/stage` apply, confirm `vae-stage-sql` gets an address in
-  `sql-dev` (10.0.32.0/24). If the producer subnet can't take it, allocate a
-  second range on `vpc-staging-shared` in `shared/`.
+- ~~At the first `envs/stage` apply, confirm `vae-stage-sql` gets an address in
+  `sql-dev` (10.0.32.0/24).~~ **Answered:** yes, it got 10.0.32.33. No
+  second range was needed.
 
 ## Changelog
 
@@ -347,3 +347,22 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
   - Provider locked at `hashicorp/google` 6.50.0, for linux_amd64, darwin_arm64 and darwin_amd64.
   - Verified: `terraform fmt -check` and `validate` pass for both roots. A read-only `terraform plan -lock=false` against the real project shows 6 resources to add in `shared/` and 33 in `envs/stage`, with no errors. Nothing was applied.
   - `infra/BOOTSTRAP.md` lists the permissions the person applying needs. It also says `staging` gets its own ruleset (required check, no PR), as DES-005 specifies. Adding `staging` to the develop/main ruleset would reject `git push origin develop:staging`.
+- 2026-11-10 — Step 2 merged in PR #10. Steps 3–6 were done by the user: bootstrap, both applies, the DB user, the first secret version, and the `Protect staging` ruleset.
+- 2026-11-10 — First deploy:
+  - Build `bfb7bf62` failed with `File infra/cloudbuild/deploy.yaml not found`. A stale local `develop`, from before PR #10, had been pushed to `staging`.
+  - Promoting `origin/develop` (`bd663f7`) fixed it, and build `360b5f9d` succeeded through `deploy-web`. The runbooks now say `git push origin origin/develop:staging`.
+- 2026-11-10 — Done. Checked on stage after the deploy:
+  - `vae-stage-sql` is on private IP 10.0.32.33, inside `sql-dev`, which answers that open question.
+  - `vae-stage-migrate` completed.
+  - On both URLs (`…-pyv57n4cvq-uw.a.run.app` and `…-47306007899.us-west1.run.app`):
+    - `/` and `/admin/login/` return 200, and admin CSS loads;
+    - an admin login POST with wrong credentials gets the normal form error, with no CSRF or host error;
+    - http redirects to https.
+  - The secret's IAM policy lists only `vae-stage-app` as accessor.
+  - No user-managed keys exist on any `vae-stage-*` service account.
+  - The nightly-stop scheduler job is enabled.
+  - Not yet run, and left to day-2 use:
+    - step 7's lifecycle check (the nightly stop, and the next deploy starting the instance);
+    - `check --deploy` through `vae-stage-manage`.
+
+  Archived.

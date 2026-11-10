@@ -1,6 +1,6 @@
 # DES-003: Environment config and secrets management
 
-- **Status:** In Progress (Cloud Run half)
+- **Status:** Done
 - **Area:** Infrastructure
 - **Created:** 2026-11-08
 - **Updated:** 2026-11-10
@@ -451,3 +451,9 @@ Manual:
     - a subprocess check that `build.py` needs no env and doesn't import the Google client.
   - Still open, and waiting for DES-008 step 2: the catalogue and runbook in `infra/README.md`, and the `secret_managers` variable.
 - 2026-11-10 — Cloud Run half merged in PR #9. The catalogue and runbook are now in `infra/README.md`, and `modules/vae-env` has the `secret_managers` variable on `feature/terraform-DES-008`. It defaults to `[]`; the open question about who goes in it is still open. The doc stays in `active/` until the stage checks under Testing / Verification have been run after the first deploy.
+- 2026-11-10 — Done. The catalogue, runbook and `secret_managers` merged in PR #10. Stage was deployed with the secret blob:
+  - the app reads its key and database settings from it;
+  - only `vae-stage-app` can access the secret;
+  - no service account keys exist.
+
+  Still open, as listed under Open Questions: who goes in `secret_managers`, and the audit-log question. The negative test (deploying with a required key missing) hasn't been run. Archived.
