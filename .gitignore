@@ -61,6 +61,7 @@ coverage.xml
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+test.sqlite3
 
 # Django collectstatic output (DES-006)
 staticfiles/
@@ -107,7 +108,8 @@ celerybeat.pid
 
 # Environments
 .env
-.env.dev
+.env.*
+!.env.example
 .venv
 env/
 venv/

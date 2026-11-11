@@ -5,6 +5,10 @@ description = "Veteran Academic Exchange"
 readme = "README.md"
 dependencies = [
   "Django>=5.1,<6.0",
+  "django-environ>=0.14,<0.15",
+  "google-cloud-secret-manager>=2.32,<3",
+  "gunicorn>=26.2,<27",
+  "psycopg[binary]>=3.3,<4",
   "whitenoise>=6.8,<7",
 ]
 authors = [
@@ -19,19 +23,52 @@ license = "MIT"
 [project.optional-dependencies]
 dev = [
   "pytest>=8.0,<9.0",
+  "pytest-cov>=7.1,<8.0",
   "pytest-django>=4.8,<5.0",
+  "ruff>=0.17.4,<0.18",  # minor releases can change formatting
 ]
 
 [build-system]
 requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["hl_vae", "works"]
+# find, not an explicit list: a list leaves hl_vae.settings and works.migrations
+# out of a built (non-editable) install, as in the Docker image (DES-008).
+[tool.setuptools.packages.find]
+include = ["hl_vae*", "works*"]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "hl_vae.settings.test"
 python_files = ["tests.py", "test_*.py"]
+addopts = "--strict-markers"
+testpaths = ["works", "hl_vae"]
+
+[tool.coverage.run]
+source = ["hl_vae", "works"]
+omit = ["*/migrations/*", "hl_vae/asgi.py", "hl_vae/wsgi.py"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+extend-exclude = [".venv", "*.md"]  # ruff 0.17 formats code blocks in Markdown; leave docs alone
+
+[tool.ruff.lint]
+select = [
+  "E", "W",   # pycodestyle
+  "F",        # pyflakes
+  "I",        # isort
+  "B",        # flake8-bugbear
+  "UP",       # pyupgrade
+  "DJ",       # flake8-django
+  "SIM",      # flake8-simplify
+]
+
+[tool.ruff.lint.per-file-ignores]
+"*/migrations/*.py" = ["E501"]   # generated; long lines are fine
+"hl_vae/settings/*.py" = ["F403", "F405"]  # star imports between settings modules (DES-002)
+
+[tool.ruff.lint.isort]
+known-first-party = ["hl_vae", "works"]
 
 [project.urls]
 "Homepage" = "https://veteranacademicexchange.org/"

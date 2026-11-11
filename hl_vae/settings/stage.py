@@ -1,7 +1,7 @@
 """Stage on Cloud Run. Cloud Run sets DJANGO_SETTINGS_MODULE to this module.
 
-DES-008 replaces the base import with `from .cloud import *`. Stage-only
-settings go below it.
+Everything shared by Cloud Run environments is in cloud.py. Stage-only
+settings go below the import.
 """
 
-from .base import *  # noqa: F403
+from .cloud import *  # noqa: F403

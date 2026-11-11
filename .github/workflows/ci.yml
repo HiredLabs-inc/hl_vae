@@ -1,0 +1,64 @@
+# App checks (DES-005). `CI / checks` is the required status check on
+# develop, staging and main. No path filter: a required check that a filter
+# skips stays pending forever and blocks the merge.
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, staging, main]
+  push:
+    branches: [develop, staging, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Cancel superseded PR runs only; every push to a protected branch finishes.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DJANGO_SETTINGS_MODULE: hl_vae.settings.test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up uv and Python
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+          python-version: "3.12"
+
+      # --locked fails if uv.lock is out of sync with pyproject.toml.
+      - name: Install
+        id: install
+        run: uv sync --locked --extra dev
+
+      # The checks below all run if install succeeded, so one run reports
+      # every failing check, not just the first.
+      - name: Format
+        if: (success() || failure()) && steps.install.outcome == 'success'
+        run: uv run ruff format --check .
+
+      - name: Lint
+        if: (success() || failure()) && steps.install.outcome == 'success'
+        run: uv run ruff check --output-format=github .
+
+      - name: Django checks
+        if: (success() || failure()) && steps.install.outcome == 'success'
+        run: uv run python manage.py check --fail-level WARNING
+
+      - name: Migrations
+        if: (success() || failure()) && steps.install.outcome == 'success'
+        run: uv run python manage.py makemigrations --check --dry-run
+
+      - name: Tests
+        if: (success() || failure()) && steps.install.outcome == 'success'
+        run: uv run pytest --cov --cov-report=term-missing

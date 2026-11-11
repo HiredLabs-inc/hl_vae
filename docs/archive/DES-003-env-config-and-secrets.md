@@ -1,9 +1,9 @@
 # DES-003: Environment config and secrets management
 
-- **Status:** Designed
+- **Status:** Done
 - **Area:** Infrastructure
 - **Created:** 2026-11-08
-- **Updated:** 2026-11-08
+- **Updated:** 2026-11-10
 - **Related:** builds on DES-002 (settings package). Implements the secret and env parts of the DES-008 app contract (`cloud.py`, the `vae-stage-app-env` blob). Takes the local Docker overrides deferred by DES-002. DES-005 runs tests with no env. Modeled on `hl_main/hl_main/settings/cloud.py` and `hl_main/hl_main/cloudrun.py`.
 
 ## Summary
@@ -362,26 +362,26 @@ In two parts, each on a branch off `develop`.
 
 **Local half**, after DES-002 and before DES-008 step 1:
 
-- [ ] Add `django-environ` to `[project] dependencies` in `pyproject.toml`,
+- [x] Add `django-environ` to `[project] dependencies` in `pyproject.toml`,
   and run `uv lock`.
-- [ ] Add `env = environ.Env()` to `base.py`.
-- [ ] Change `dev.py` to the version above: optional `.env`, `DJANGO_DEBUG`,
+- [x] Add `env = environ.Env()` to `base.py`.
+- [x] Change `dev.py` to the version above: optional `.env`, `DJANGO_DEBUG`,
   `DJANGO_SECRET_KEY`, `ALLOWED_HOSTS`, `DATABASE_URL`.
-- [ ] Add `.env.example` and update `.gitignore`.
-- [ ] Add the `.env` and `DATABASE_URL` tests below.
-- [ ] Update `README.md`: copy `.env.example` to `.env` to override dev
+- [x] Add `.env.example` and update `.gitignore`.
+- [x] Add the `.env` and `DATABASE_URL` tests below.
+- [x] Update `README.md`: copy `.env.example` to `.env` to override dev
   settings; nothing is needed by default.
 
 **Cloud Run half**, as part of DES-008 step 1:
 
-- [ ] Add `google-cloud-secret-manager` to `[project] dependencies`, and run
+- [x] Add `google-cloud-secret-manager` to `[project] dependencies`, and run
   `uv lock`.
-- [ ] Add `load_app_env` to `hl_vae/cloudrun.py` (next to `deterministic_host`,
+- [x] Add `load_app_env` to `hl_vae/cloudrun.py` (next to `deterministic_host`,
   per the DES-008 app contract), and call it from `cloud.py` with `SECRET_KEY`
   and `SECRET_KEY_FALLBACKS` read as above.
-- [ ] Make sure DES-008's `.dockerignore` lists `.env` and `.env.*`.
-- [ ] Add the `load_app_env` tests below.
-- [ ] Add the catalogue and runbook to `infra/README.md`, and the
+- [x] Make sure DES-008's `.dockerignore` lists `.env` and `.env.*`.
+- [x] Add the `load_app_env` tests below.
+- [x] Add the catalogue and runbook to `infra/README.md`, and the
   `secret_managers` variable to `modules/vae-env` (once its value is decided).
 
 ## Testing / Verification
@@ -431,3 +431,29 @@ Manual:
 
 - 2026-11-08 — Created.
 - 2026-11-08 — Implementation split into a local half (before DES-008) and a Cloud Run half (with DES-008 step 1). `deterministic_host` is now defined in DES-008's app contract.
+- 2026-11-10 — Local half implemented on `feature/env-config-DES-003`. Details:
+  - Installed `django-environ` 0.14.0 (`>=0.14,<0.15`).
+  - With no `.env`, the dev settings are unchanged. The only difference is that `DATABASES["default"]["NAME"]` is now a string rather than a `Path`.
+  - `dev.py` has no `# noqa: F405` comments, because `pyproject.toml` already ignores F403/F405 in settings (DES-005).
+  - Tests in `works/tests.py`:
+    - they reload `dev.py` with a controlled environment (dev defaults, `DATABASE_URL`, overrides);
+    - one test points `BASE_DIR` at a temp `.env` to show that shell values win over `.env`;
+    - one runs a subprocess with a `.env` in its working directory to show that test settings ignore it.
+  - A `postgres://` `DATABASE_URL` parses correctly, but `manage.py` needs `psycopg`, which DES-008 step 1 adds. `.env.example` and the README say so.
+  - The Cloud Run half stays with DES-008 step 1.
+- 2026-11-10 — Local half done (PR #8). Cloud Run half implemented with DES-008 step 1 on `feature/cloud-run-app-DES-008`. Details:
+  - Installed `google-cloud-secret-manager` 2.32.0.
+  - `load_app_env` matches the design. The client is created in a small `_secret_client()` helper so tests can swap in a fake.
+  - `cloud.py` also drops empty entries from `DJANGO_SECRET_KEY_FALLBACKS` and `ALLOWED_HOSTS`, since the blob sets `ALLOWED_HOSTS=` empty on stage.
+  - Tests are in `hl_vae/tests/`:
+    - `load_app_env`: loading, existing values win, and the error names the secret path;
+    - `cloud.py` and `stage.py` with a fake secret: a missing required value fails at import, and the secret can't turn `DEBUG` on;
+    - a subprocess check that `build.py` needs no env and doesn't import the Google client.
+  - Still open, and waiting for DES-008 step 2: the catalogue and runbook in `infra/README.md`, and the `secret_managers` variable.
+- 2026-11-10 — Cloud Run half merged in PR #9. The catalogue and runbook are now in `infra/README.md`, and `modules/vae-env` has the `secret_managers` variable on `feature/terraform-DES-008`. It defaults to `[]`; the open question about who goes in it is still open. The doc stays in `active/` until the stage checks under Testing / Verification have been run after the first deploy.
+- 2026-11-10 — Done. The catalogue, runbook and `secret_managers` merged in PR #10. Stage was deployed with the secret blob:
+  - the app reads its key and database settings from it;
+  - only `vae-stage-app` can access the secret;
+  - no service account keys exist.
+
+  Still open, as listed under Open Questions: who goes in `secret_managers`, and the audit-log question. The negative test (deploying with a required key missing) hasn't been run. Archived.

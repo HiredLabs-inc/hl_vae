@@ -1,9 +1,9 @@
 # DES-008: GCP infrastructure (stage on Cloud Run)
 
-- **Status:** Designed
+- **Status:** Done
 - **Area:** Infrastructure
 - **Created:** 2026-11-08
-- **Updated:** 2026-11-08
+- **Updated:** 2026-11-10
 - **Related:** supersedes DES-004 and DES-007. Follow-ups: DES-002, DES-003, DES-005, DES-006, DES-009. Modeled on `hl_main/infra/` (`TARGET_DESIGN.md`, `README.md`).
 
 ## Summary
@@ -33,7 +33,7 @@ redesigning anything.
 
 - A reproducible stage environment, defined in Terraform and reviewed in git.
 - A push to `staging` builds, migrates and deploys. `develop` is promoted with
-  `git push origin develop:staging`.
+  `git push origin origin/develop:staging`.
 - No service account keys anywhere, and no secrets or passwords in Terraform state.
 - Scale to zero. The database is stopped when nobody is testing.
 - Decide DES-004 (database) and DES-007 (deploy target), and define the
@@ -240,16 +240,16 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
    hardcoded `SECRET_KEY` removed), WhiteNoise and the static settings, the
    `env` reader, `DATABASE_URL` in `dev.py`, and `.env.example`. This step adds
    only what's specific to Cloud Run:
-   - [ ] Add `gunicorn` and `psycopg[binary]` to the dependencies.
+   - [x] Add `gunicorn` and `psycopg[binary]` to the dependencies.
      (`django-environ` and `whitenoise` arrive with DES-003 and DES-006;
      `google-cloud-secret-manager` is added here with the loader, per DES-003.)
-   - [ ] Add `hl_vae/cloudrun.py` with `deterministic_host` (above) and
+   - [x] Add `hl_vae/cloudrun.py` with `deterministic_host` (above) and
      `load_app_env` (DES-003).
-   - [ ] Add `hl_vae/settings/cloud.py`: secret loading and `SECRET_KEY` per
+   - [x] Add `hl_vae/settings/cloud.py`: secret loading and `SECRET_KEY` per
      DES-003, then hosts, CSRF origins, Postgres and the secure-cookie, HSTS
      and SSL-proxy settings. Switch `stage.py` to `from .cloud import *`.
-   - [ ] Add `hl_vae/settings/build.py` with the docstring from DES-006.
-   - [ ] Fix `[tool.setuptools]` in `pyproject.toml` before the Dockerfile.
+   - [x] Add `hl_vae/settings/build.py` with the docstring from DES-006.
+   - [x] Fix `[tool.setuptools]` in `pyproject.toml` before the Dockerfile.
      It lists `packages = ["hl_vae", "works"]` explicitly, so a built wheel
      leaves out `hl_vae/settings/` and `works/migrations/` (checked against
      the DES-002 code, 2026-11-08). Running from the repo or from an editable
@@ -257,32 +257,32 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
      `uv sync --no-editable`) would fail with no settings module. Switch to
      `[tool.setuptools.packages.find]` with `include = ["hl_vae*", "works*"]`,
      or list the subpackages.
-   - [ ] Add a `Dockerfile` (with DES-006's `collectstatic` step) and a
+   - [x] Add a `Dockerfile` (with DES-006's `collectstatic` step) and a
      `.dockerignore` listing `staticfiles/`, `.env` and `.env.*`. Check that
      `docker build` works and that the container serves locally against
      Postgres via `DATABASE_URL`.
 2. **Terraform skeleton:**
-   - [ ] Add `infra/terraform/{shared,modules/vae-env,envs/stage}` and
+   - [x] Add `infra/terraform/{shared,modules/vae-env,envs/stage}` and
      `infra/cloudbuild/deploy.yaml`.
-   - [ ] Add `infra/README.md` (layout, conventions, day-2 runbook) and
+   - [x] Add `infra/README.md` (layout, conventions, day-2 runbook) and
      `infra/BOOTSTRAP.md` (below).
-   - [ ] Confirm `terraform fmt -check` and `terraform validate` pass for every root.
+   - [x] Confirm `terraform fmt -check` and `terraform validate` pass for every root.
 3. **Bootstrap**, done by the user by hand following `infra/BOOTSTRAP.md`:
-   - [ ] Create project `hl-vae-stage` in the Staging folder and link the billing account.
-   - [ ] Connect the Cloud Build GitHub App to `HiredLabs-inc/hl_vae` in `hl-vae-stage`
+   - [x] Create project `hl-vae-stage` in the Staging folder and link the billing account.
+   - [x] Connect the Cloud Build GitHub App to `HiredLabs-inc/hl_vae` in `hl-vae-stage`
      (Console → Cloud Build → Triggers → Connect repository, 1st gen).
-   - [ ] Create the `staging` branch on `origin` from `develop`.
-   - [ ] Confirm `gs://hiredlabs-tf-state` access. The bucket already exists; only the `vae/*` prefixes are new.
+   - [x] Create the `staging` branch on `origin` from `develop`.
+   - [x] Confirm `gs://hiredlabs-tf-state` access. The bucket already exists; only the `vae/*` prefixes are new.
 4. **Apply:**
-   - [ ] `terraform apply` in `infra/terraform/shared`, then in `envs/stage`.
+   - [x] `terraform apply` in `infra/terraform/shared`, then in `envs/stage`.
 5. **Out-of-band secrets:**
-   - [ ] `gcloud sql users create vae --instance=vae-stage-sql --password=... --project=hl-vae-stage`.
-   - [ ] Write the `.env`, run `gcloud secrets versions add vae-stage-app-env --data-file=.env`,
+   - [x] `gcloud sql users create vae --instance=vae-stage-sql --password=... --project=hl-vae-stage`.
+   - [x] Write the `.env`, run `gcloud secrets versions add vae-stage-app-env --data-file=.env`,
      and delete the local file.
 6. **First deploy:**
-   - [ ] Promote `develop` to `staging` (`git push origin develop:staging`), with
+   - [x] Promote `develop` to `staging` (`git push origin origin/develop:staging`), with
      `infra/cloudbuild/deploy.yaml` already on `develop`.
-   - [ ] Smoke-test the `run.app` URL.
+   - [x] Smoke-test the `run.app` URL.
 7. **Lifecycle check:**
    - [ ] The next morning, confirm `vae-stage-sql` was stopped by the scheduler.
    - [ ] Confirm the next deploy starts it again.
@@ -312,13 +312,14 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
 - ~~Custom domain later?~~ **Answered:** yes, the intent is
   `veteranacademicexchange.org`, but it depends on real-world factors.
   Tracked as **DES-009** (Idea).
-- Will the image install the project non-editable? If so, the
-  `[tool.setuptools]` fix in step 1 is required, not optional. Either way,
-  `docker build` in step 1 should confirm `hl_vae.settings.stage` imports
-  inside the container.
-- At the first `envs/stage` apply, confirm `vae-stage-sql` gets an address in
-  `sql-dev` (10.0.32.0/24). If the producer subnet can't take it, allocate a
-  second range on `vpc-staging-shared` in `shared/`.
+- ~~Will the image install the project non-editable?~~ **Answered (step 1):**
+  no. The image installs only the dependencies (`uv sync --frozen
+  --no-install-project`) and runs the code from `/app`, so `BASE_DIR` and
+  `STATIC_ROOT` are under `/app`. The `[tool.setuptools]` fix was made anyway,
+  and `hl_vae.settings.stage` resolves inside the container.
+- ~~At the first `envs/stage` apply, confirm `vae-stage-sql` gets an address in
+  `sql-dev` (10.0.32.0/24).~~ **Answered:** yes, it got 10.0.32.33. No
+  second range was needed.
 
 ## Changelog
 
@@ -326,3 +327,42 @@ Work happens on a branch off `develop` and reaches stage through `develop` → `
 - 2026-11-08 — Cloud Run now uses `hl_vae.settings.stage` (which imports `cloud`), following the DES-002 layout.
 - 2026-11-08 — Step 1 narrowed to the Cloud Run-specific pieces; DES-002, DES-006 and DES-003's local half land first. Added `hl_vae/cloudrun.py` (`deterministic_host`, `load_app_env`) to the app contract. `build.py` inherits static settings (DES-006).
 - 2026-11-08 — Noted from the DES-002 implementation: `[tool.setuptools] packages` leaves `hl_vae.settings` and `works.migrations` out of a built wheel. Added a fix to step 1 and an open question.
+- 2026-11-10 — Step 1 (app contract) implemented on `feature/cloud-run-app-DES-008`, together with DES-003's Cloud Run half. Details:
+  - Installed `gunicorn` 26.2.0 (`>=26.2,<27`; 27.0.0 was released the same day, so it was skipped), `psycopg[binary]` 3.3.8 and `google-cloud-secret-manager` 2.32.0.
+  - `cloud.py` follows `hl_main/settings/cloud.py`, minus hl_main's app-specific values. It also silences `security.W021` (HSTS preload is off on purpose), so `check --deploy` reports no warnings.
+  - `cloudrun.py` puts the Secret Manager client behind `_secret_client()` so tests can swap in a fake.
+  - Dockerfile: `python:3.12-slim` plus uv 0.13.1. It installs the dependencies only (see Open Questions) and runs as a non-root `app` user. gunicorn runs with `--no-control-socket`: gunicorn 26 otherwise tries to create a control socket in the home directory, which this user doesn't have. `DJANGO_SETTINGS_MODULE` isn't set in the image.
+  - Verified locally:
+    - the image builds and contains no `.env`;
+    - against `postgres:15`, `migrate` runs, and `/` and `/admin/login/` return 200;
+    - admin CSS is served hashed, gzipped and `immutable`;
+    - with no settings module, the image fails with `ImproperlyConfigured`;
+    - `check --deploy` under `hl_vae.settings.stage`, with a fake secret, reports no issues;
+    - a built wheel includes `hl_vae/settings/` and `works/migrations/`.
+- 2026-11-10 — Step 1 merged in PR #9. Step 3 progress from the user: `hl-vae-stage` was created with billing linked, and `staging` is on origin.
+- 2026-11-10 — Step 2 (Terraform skeleton) implemented on `feature/terraform-DES-008`. Details:
+  - `shared/` enables compute (which the Shared VPC attachment needs), orgpolicy and artifactregistry on `hl-vae-stage`. It also attaches the project to the staging Shared VPC, relaxes `run.managed.requireInvokerIam` (quota-billed to `hl-vae-stage`), and creates `vae-images`.
+  - `modules/vae-env` is hl_main's `hl-env` minus the worker, Cloud Tasks, media bucket, reminders and Vertex AI. It adds the runtime roles from this doc (`cloudsql.client`, `logging.logWriter`) and DES-003's `secret_managers` variable, which defaults to empty.
+  - `envs/stage` passes `image_repo` and `artifact_repo` as literal values, as hl_main does, rather than reading them from shared state.
+  - Provider locked at `hashicorp/google` 6.50.0, for linux_amd64, darwin_arm64 and darwin_amd64.
+  - Verified: `terraform fmt -check` and `validate` pass for both roots. A read-only `terraform plan -lock=false` against the real project shows 6 resources to add in `shared/` and 33 in `envs/stage`, with no errors. Nothing was applied.
+  - `infra/BOOTSTRAP.md` lists the permissions the person applying needs. It also says `staging` gets its own ruleset (required check, no PR), as DES-005 specifies. Adding `staging` to the develop/main ruleset would reject `git push origin develop:staging`.
+- 2026-11-10 — Step 2 merged in PR #10. Steps 3–6 were done by the user: bootstrap, both applies, the DB user, the first secret version, and the `Protect staging` ruleset.
+- 2026-11-10 — First deploy:
+  - Build `bfb7bf62` failed with `File infra/cloudbuild/deploy.yaml not found`. A stale local `develop`, from before PR #10, had been pushed to `staging`.
+  - Promoting `origin/develop` (`bd663f7`) fixed it, and build `360b5f9d` succeeded through `deploy-web`. The runbooks now say `git push origin origin/develop:staging`.
+- 2026-11-10 — Done. Checked on stage after the deploy:
+  - `vae-stage-sql` is on private IP 10.0.32.33, inside `sql-dev`, which answers that open question.
+  - `vae-stage-migrate` completed.
+  - On both URLs (`…-pyv57n4cvq-uw.a.run.app` and `…-47306007899.us-west1.run.app`):
+    - `/` and `/admin/login/` return 200, and admin CSS loads;
+    - an admin login POST with wrong credentials gets the normal form error, with no CSRF or host error;
+    - http redirects to https.
+  - The secret's IAM policy lists only `vae-stage-app` as accessor.
+  - No user-managed keys exist on any `vae-stage-*` service account.
+  - The nightly-stop scheduler job is enabled.
+  - Not yet run, and left to day-2 use:
+    - step 7's lifecycle check (the nightly stop, and the next deploy starting the instance);
+    - `check --deploy` through `vae-stage-manage`.
+
+  Archived.
