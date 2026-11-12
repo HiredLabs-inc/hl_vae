@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Veteran Academic Exchange{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'vae/css/site.css' %}">
+  <script src="{% static 'vae/js/site.js' %}" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="{% url 'index' %}">Veteran Academic Exchange</a>
+    </div>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">© {% now "Y" %} Veteran Academic Exchange</div>
+  </footer>
+</body>
+</html>
