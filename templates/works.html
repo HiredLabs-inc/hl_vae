@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+  <h1>Works</h1>
+  <p>Placeholder tagline. Replace when copy is ready.</p>
+  {% for num in work_number_1 %}
+  {{num}}
+  {% endfor %}
+</section>
+{% endblock %}

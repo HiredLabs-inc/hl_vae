@@ -19,6 +19,26 @@ class SmokeTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "index.html")
 
+    def test_about_renders_template(self):
+        response = self.client.get("/about/")
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "about.html")
+
+    def test_works_renders_template(self):
+        response = self.client.get("/works/")
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "works.html")
+
+    def test_submit_a_work_renders_template(self):
+        response = self.client.get("/submit_a_work/")
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "submit_a_work.html")
+
+    def test_reviewer_renders_template(self):
+        response = self.client.get("/reviewer/")
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "reviewer.html")
+
     def test_uses_test_settings(self):
         self.assertEqual(settings.SECRET_KEY, "test-only-not-secret")
 

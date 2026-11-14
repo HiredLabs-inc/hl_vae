@@ -23,4 +23,8 @@ from works import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.home_view, name="index"),
+    path("about/", views.about_view, name="about"),
+    path("works/", views.works_view, name="works"),
+    path("submit_a_work/", views.submit_a_work_view, name="submit_a_work"),
+    path("reviewer/", views.reviewer_view, name="reviewer"),
 ]
