@@ -24,6 +24,22 @@ def fake_secret_client(blob=None, error=None):
     return client
 
 
+class ProjectNumberTests(SimpleTestCase):
+    @mock.patch.object(cloudrun.urllib.request, "urlopen")
+    def test_reads_number_from_metadata_server(self, urlopen):
+        urlopen.return_value.__enter__.return_value.read.return_value = b"123\n"
+        self.assertEqual(cloudrun._project_number(), "123")
+        request = urlopen.call_args.args[0]
+        self.assertEqual(request.full_url, cloudrun.METADATA_URL)
+        self.assertEqual(request.get_header("Metadata-flavor"), "Google")
+
+
+class SecretClientTests(SimpleTestCase):
+    @mock.patch("google.cloud.secretmanager.SecretManagerServiceClient")
+    def test_returns_secret_manager_client(self, client_cls):
+        self.assertIs(cloudrun._secret_client(), client_cls.return_value)
+
+
 class DeterministicHostTests(SimpleTestCase):
     @mock.patch.dict(os.environ, {"K_SERVICE": "vae-stage-web"})
     @mock.patch.object(cloudrun, "_project_number", return_value="123456789")
