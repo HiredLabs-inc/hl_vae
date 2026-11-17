@@ -16,7 +16,7 @@ infrastructure task, or refactor gets a row here. Bugs are tracked separately in
 
 **Conventions**
 
-- **IDs:** `DES-001`, `DES-002`, … — sequential, never reused. Next free ID: **DES-010**.
+- **IDs:** `DES-001`, `DES-002`, … — sequential, never reused. Next free ID: **DES-011**.
 - **File names:** `<ID>-<kebab-slug>.md`, e.g. `designed/DES-002-settings-split.md`.
 - **Promoting an idea:** copy [`templates/design-template.md`](templates/design-template.md)
   into `designed/`, fill it in, and link it from the row (moving the row to *Designed*).
@@ -65,9 +65,13 @@ merged.
 5. **DES-009 — Custom domain.** Still an *Idea*: it needs a design doc first,
    and it builds on DES-008 (load balancer / domain mapping, and possibly
    Cloud CDN from DES-006's deferred options). Not ready to implement.
+6. **[DES-010](archive/DES-010-frontend-foundation-and-home-page.md) — Frontend
+   foundation and home page.** Done (PR #13). Needs DES-006 (static files) and
+   was checked by DES-005's CI. Independent of DES-009.
 
 ```
 DES-002 (done) ─► DES-006 (done) ─► DES-005 (done) ─► DES-003 local (done) ─► DES-008 + DES-003 Cloud Run half (done) ─► DES-009 (needs design)
+DES-006 (done) ─► DES-010 (done)
 ```
 
 ---
@@ -85,3 +89,4 @@ DES-002 (done) ─► DES-006 (done) ─► DES-005 (done) ─► DES-003 local 
 | DES-007 | Deployment target and process | Infrastructure | merged into [DES-008](archive/DES-008-gcp-infrastructure.md) | 2026-11-08 | Dropped |
 | DES-008 | GCP infrastructure (stage on Cloud Run) | Infrastructure | [doc](archive/DES-008-gcp-infrastructure.md) | 2026-11-10 | Done |
 | DES-009 | Custom domain: veteranacademicexchange.org | Infrastructure | | 2026-11-08 | Idea |
+| DES-010 | Frontend foundation and home page | Frontend | [doc](archive/DES-010-frontend-foundation-and-home-page.md) | 2026-11-16 | Done |

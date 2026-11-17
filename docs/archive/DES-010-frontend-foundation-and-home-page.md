@@ -1,10 +1,10 @@
 # DES-010: Frontend foundation and home page (HTML, CSS, JS)
 
-- **Status:** Designed
+- **Status:** Done
 - **Area:** Frontend
 - **Created:** 2026-11-10
-- **Updated:** 2026-11-11
-- **Related:** branch `feature/home-view`. Uses the static-files setup from [DES-006](../archive/DES-006-static-files.md) (WhiteNoise, `static/vae/…`). Tests run in `CI / checks` from [DES-005](../archive/DES-005-ci-pipeline.md). Stage from [DES-008](../archive/DES-008-gcp-infrastructure.md).
+- **Updated:** 2026-11-16
+- **Related:** branch `feature/home-view`. Uses the static-files setup from [DES-006](DES-006-static-files.md) (WhiteNoise, `static/vae/…`). Tests run in `CI / checks` from [DES-005](DES-005-ci-pipeline.md). Stage from [DES-008](DES-008-gcp-infrastructure.md).
 
 ## Summary
 
@@ -163,13 +163,13 @@ The text colours on both backgrounds meet WCAG AA contrast (4.5:1).
 
 ## Implementation Plan
 
-- [ ] Add `templates/base.html` and fill in `templates/index.html`.
-- [ ] Add `static/vae/css/site.css` and `static/vae/js/site.js`, and delete
+- [x] Add `templates/base.html` and fill in `templates/index.html`.
+- [x] Add `static/vae/css/site.css` and `static/vae/js/site.js`, and delete
   `static/.gitkeep`.
-- [ ] Add the tests below to `works/tests.py`.
-- [ ] In `docs/backlog.md`, add a DES-010 row and bump *Next free ID* to
+- [x] Add the tests below to `works/tests.py`.
+- [x] In `docs/backlog.md`, add a DES-010 row and bump *Next free ID* to
   **DES-011**.
-- [ ] Run the README's *Check your work before pushing* command, then open a
+- [x] Run the README's *Check your work before pushing* command, then open a
   PR into `develop`.
 
 ## Testing / Verification
@@ -202,3 +202,5 @@ The text colours on both backgrounds meet WCAG AA contrast (4.5:1).
 - 2026-11-10 — Revised after merging `develop`, which brought in DES-006.
 - 2026-11-11 — Revised after merging `develop` up to PR #11 (DES-005, DES-003 and DES-008 done).
 - 2026-11-11 — Rescoped to an MVP: hero-only home page, header and footer in `base.html` (no include files), a short stylesheet with system fonts and a neutral palette as variables, and an empty vanilla JS stub. Dropped the cascade layers, BEM conventions, nav toggle, accessibility and performance budgets, CSP rules, the README section and most of the tests.
+- 2026-11-11 — Implemented on `feature/frontend-design` and merged into `develop` in PR #13. The two tests went in `hl_vae/tests/test_home_view.py` rather than `works/tests.py`.
+- 2026-11-16 — Done. Promoted to stage. The extra pages and header nav links added later in PR #16 are outside this doc. Archived.
