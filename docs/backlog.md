@@ -16,7 +16,7 @@ infrastructure task, or refactor gets a row here. Bugs are tracked separately in
 
 **Conventions**
 
-- **IDs:** `DES-001`, `DES-002`, … — sequential, never reused. Next free ID: **DES-011**.
+- **IDs:** `DES-001`, `DES-002`, … — sequential, never reused. Next free ID: **DES-012**.
 - **File names:** `<ID>-<kebab-slug>.md`, e.g. `designed/DES-002-settings-split.md`.
 - **Promoting an idea:** copy [`templates/design-template.md`](templates/design-template.md)
   into `designed/`, fill it in, and link it from the row (moving the row to *Designed*).
@@ -90,3 +90,4 @@ DES-006 (done) ─► DES-010 (done)
 | DES-008 | GCP infrastructure (stage on Cloud Run) | Infrastructure | [doc](archive/DES-008-gcp-infrastructure.md) | 2026-11-10 | Done |
 | DES-009 | Custom domain: veteranacademicexchange.org | Infrastructure | | 2026-11-08 | Idea |
 | DES-010 | Frontend foundation and home page | Frontend | [doc](archive/DES-010-frontend-foundation-and-home-page.md) | 2026-11-16 | Done |
+| DES-011 | Dimension tables (work types, institutions, subjects, disciplines, topics, publications) | Works | [doc](designed/DES-011-dimension-tables.md) | 2026-11-17 | Designed |
