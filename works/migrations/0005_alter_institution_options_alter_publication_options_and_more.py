@@ -5,61 +5,68 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('works', '0004_discipline'),
+        ("works", "0004_discipline"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='institution',
-            options={'ordering': ['name']},
+            name="institution",
+            options={"ordering": ["name"]},
         ),
         migrations.AlterModelOptions(
-            name='publication',
-            options={'ordering': ['name']},
+            name="publication",
+            options={"ordering": ["name"]},
         ),
         migrations.AlterModelOptions(
-            name='worktype',
-            options={'ordering': ['name']},
+            name="worktype",
+            options={"ordering": ["name"]},
         ),
         migrations.RemoveField(
-            model_name='topic',
-            name='name',
+            model_name="topic",
+            name="name",
         ),
         migrations.AddField(
-            model_name='topic',
-            name='discipline',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='works.discipline'),
+            model_name="topic",
+            name="discipline",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="works.discipline",
+            ),
         ),
         migrations.AddField(
-            model_name='topic',
-            name='subject',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='works.subject'),
+            model_name="topic",
+            name="subject",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="works.subject",
+            ),
         ),
         migrations.AlterField(
-            model_name='discipline',
-            name='name',
+            model_name="discipline",
+            name="name",
             field=models.CharField(max_length=120, unique=True),
         ),
         migrations.AlterField(
-            model_name='institution',
-            name='name',
+            model_name="institution",
+            name="name",
             field=models.CharField(max_length=120, unique=True),
         ),
         migrations.AlterField(
-            model_name='publication',
-            name='name',
+            model_name="publication",
+            name="name",
             field=models.CharField(max_length=120, unique=True),
         ),
         migrations.AlterField(
-            model_name='subject',
-            name='name',
+            model_name="subject",
+            name="name",
             field=models.CharField(max_length=120, unique=True),
         ),
         migrations.AlterField(
-            model_name='worktype',
-            name='name',
+            model_name="worktype",
+            name="name",
             field=models.CharField(max_length=120, unique=True),
         ),
     ]
