@@ -90,4 +90,4 @@ DES-006 (done) ─► DES-010 (done)
 | DES-008 | GCP infrastructure (stage on Cloud Run) | Infrastructure | [doc](archive/DES-008-gcp-infrastructure.md) | 2026-11-10 | Done |
 | DES-009 | Custom domain: veteranacademicexchange.org | Infrastructure | | 2026-11-08 | Idea |
 | DES-010 | Frontend foundation and home page | Frontend | [doc](archive/DES-010-frontend-foundation-and-home-page.md) | 2026-11-16 | Done |
-| DES-011 | Dimension tables (work types, institutions, subjects, disciplines, topics, publications) | Works | [doc](designed/DES-011-dimension-tables.md) | 2026-11-17 | Designed |
+| DES-011 | Dimension tables (work types, institutions, subjects, disciplines, topics, publications) | Works | [doc](archive/DES-011-dimension-tables.md) | 2026-11-18 | Done |

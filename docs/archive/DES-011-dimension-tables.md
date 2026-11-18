@@ -1,10 +1,10 @@
 # DES-011: Dimension tables (work types, institutions, subjects, disciplines, topics, publications)
 
-- **Status:** Designed
+- **Status:** Done
 - **Area:** Works
 - **Created:** 2026-11-17
-- **Updated:** 2026-11-17
-- **Related:** comes before the `Work` model, which will reference these tables. Builds on [DES-010](../archive/DES-010-frontend-foundation-and-home-page.md) (the `/works/` page) and runs on the stage set up in [DES-008](../archive/DES-008-gcp-infrastructure.md).
+- **Updated:** 2026-11-18
+- **Related:** comes before the `Work` model, which will reference these tables. Builds on [DES-010](DES-010-frontend-foundation-and-home-page.md) (the `/works/` page) and runs on the stage set up in [DES-008](DES-008-gcp-infrastructure.md).
 
 ## Summary
 
@@ -76,12 +76,12 @@ No settings or infra changes are needed.
 
 ## Implementation Plan
 
-- [ ] Add the six models to `works/models.py`.
-- [ ] Register them in `works/admin.py`.
-- [ ] Run `makemigrations` to create `works/migrations/0001_initial.py`.
-- [ ] Add the tests below to `works/tests.py`.
-- [ ] In `docs/backlog.md`, move DES-011 to *In Progress* and then *Done*, as the conventions describe.
-- [ ] Run the README's *Check your work before pushing* command, then open a
+- [x] Add the six models to `works/models.py`.
+- [x] Register them in `works/admin.py`.
+- [x] Run `makemigrations` to create `works/migrations/0001_initial.py`.
+- [x] Add the tests below to `works/tests.py`.
+- [x] In `docs/backlog.md`, move DES-011 to *In Progress* and then *Done*, as the conventions describe.
+- [x] Run the README's *Check your work before pushing* command, then open a
   PR into `develop`.
 
 ## Testing / Verification
@@ -109,3 +109,12 @@ No settings or infra changes are needed.
 ## Changelog
 
 - 2026-11-17 — Created. Flat dimension tables only. Authors are left out and will be designed later, together with authentication and login.
+- 2026-11-18 — Implemented on `feature/dimension-tables-01` (PR #20). It differs from the design:
+  - `Topic` has no `name`. It links a `Subject` and a `Discipline` (both optional foreign keys, `CASCADE` on delete). This adds the subject/discipline/topic hierarchy that the design listed as a non-goal.
+  - `Subject`, `Discipline` and `Topic` have no default ordering.
+  - `__str__` includes the row id (for example `Engineering 3`), and `Topic` shows `discipline , subject , #id`.
+  - Admin uses the plain default registration, with no `list_display` or `search_fields`.
+  - There are five migrations (`0001`–`0005`) rather than a single `0001_initial.py`.
+  - Tests are in `works/test_models.py` and cover `__str__` only, enough for 100% coverage. The duplicate-name, ordering and admin checks weren't added.
+
+  Archived.
