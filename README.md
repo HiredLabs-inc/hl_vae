@@ -1,4 +1,7 @@
-# Veteran Academic Exchange
+# Veteran Academic Exchange (VAE)
+A system for reviewing, categorizing, and presenting academic works created by U.S. military veterans. This Django web app is used to administer the website. It includes basic website functionality (e.g. landing page, user accounts, uploads, etc.), and mechanisms for executing a submit-review-publish pipeline. 
+
+The publicly available repository will be a list of works submitted by veterans that have been approved by reviewers. Although the VAE is a broader project, this repository provides the functional system for handling submissions, reviewing them, and presenting them clearly once approved.
 
 ## Development setup with uv
 
