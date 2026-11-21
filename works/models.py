@@ -51,3 +51,26 @@ class Topic(models.Model):
 
     def __str__(self):
         return f"{self.discipline.name} , {self.subject.name} , #{self.id}"
+
+
+class Author(models.Model):
+    name = models.CharField(max_length=120)
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class Work(models.Model):
+    title = models.CharField(max_length=200)
+    link = models.URLField("", max_length=200, unique=True, null=True)
+    file = models.FileField((""), upload_to="uploads/", max_length=200, null=True)
+    published_date = models.DateField(null=True, default=None)
+    revised_date = models.DateField(null=True, default=None)
+    is_published = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=False)
+
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    topic = models.ForeignKey(Topic, on_delete=models.SET_NULL, null=True)
+    institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, null=True)
+    work_type = models.ForeignKey(WorkType, on_delete=models.SET_NULL, null=True)
+    publication = models.ForeignKey(Publication, on_delete=models.SET_NULL, null=True)
