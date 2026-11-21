@@ -5,35 +5,88 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('works', '0005_alter_institution_options_alter_publication_options_and_more'),
+        ("works", "0005_alter_institution_options_alter_publication_options_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Author',
+            name="Author",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=120)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=120)),
             ],
         ),
         migrations.CreateModel(
-            name='Work',
+            name="Work",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200)),
-                ('link', models.URLField(null=True, unique=True, verbose_name='')),
-                ('file', models.FileField(max_length=200, null=True, upload_to='uploads/', verbose_name='')),
-                ('published_date', models.DateField(default=None, null=True)),
-                ('revised_date', models.DateField(default=None, null=True)),
-                ('is_published', models.BooleanField(default=False)),
-                ('is_approved', models.BooleanField(default=False)),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='works.author')),
-                ('institution', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='works.institution')),
-                ('publication', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='works.publication')),
-                ('topic', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='works.topic')),
-                ('work_type', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='works.worktype')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=200)),
+                ("link", models.URLField(null=True, unique=True, verbose_name="")),
+                (
+                    "file",
+                    models.FileField(
+                        max_length=200, null=True, upload_to="uploads/", verbose_name=""
+                    ),
+                ),
+                ("published_date", models.DateField(default=None, null=True)),
+                ("revised_date", models.DateField(default=None, null=True)),
+                ("is_published", models.BooleanField(default=False)),
+                ("is_approved", models.BooleanField(default=False)),
+                (
+                    "author",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="works.author"
+                    ),
+                ),
+                (
+                    "institution",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="works.institution",
+                    ),
+                ),
+                (
+                    "publication",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="works.publication",
+                    ),
+                ),
+                (
+                    "topic",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="works.topic",
+                    ),
+                ),
+                (
+                    "work_type",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="works.worktype",
+                    ),
+                ),
             ],
         ),
     ]
